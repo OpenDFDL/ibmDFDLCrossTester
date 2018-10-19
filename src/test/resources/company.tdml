@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tdml:testSuite xmlns:dfdl="http://www.ogf.org/dfdl/dfdl-1.0/"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:ex="http://example.com"
+              xmlns:tdml="http://www.ibm.com/xmlns/dfdl/testData"
+              xmlns:ibmDfdlExtn="http://www.ibm.com/dfdl/extensions"
+              suiteName="theSuiteName"
+              defaultImplementations="io.github.openDFDL.IBM_DFDL daffodil"
+              defaultRoundTrip="onePass">
+
+  <tdml:parserTestCase name="company1" model="company.xsd"
+    implementations="io.github.openDFDL.IBM_DFDL daffodil">
+    <tdml:document>
+      <tdml:documentPart type="file">company.txt</tdml:documentPart>
+    </tdml:document>
+    <tdml:infoset>
+      <tdml:dfdlInfoset type="file">company.xml</tdml:dfdlInfoset>
+    </tdml:infoset>
+  </tdml:parserTestCase>
+  
+</tdml:testSuite>
