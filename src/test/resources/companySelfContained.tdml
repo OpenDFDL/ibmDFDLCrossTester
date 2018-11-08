@@ -7,7 +7,7 @@
               xmlns:ibmDfdlExtn="http://www.ibm.com/dfdl/extensions"
               xmlns:recSepFieldsFmt="http://www.ibm.com/dfdl/RecordSeparatedFieldFormat"
               suiteName="theSuiteName"
-              defaultImplementations="io.github.openDFDL.IBM_DFDL daffodil"
+              defaultImplementations="ibm daffodil"
               defaultRoundTrip="onePass">
 
 <tdml:defineSchema name="companySchema">
@@ -74,7 +74,7 @@
   
   </tdml:defineSchema>
 
-  <tdml:parserTestCase name="company1" model="companySchema" implementations="daffodil">
+  <tdml:parserTestCase name="company1" model="companySchema">
     <tdml:document>
       <tdml:documentPart type="text" replaceDFDLEntities="true"><![CDATA[Company[compName=My Company%CR;
 Employee(empNum=111111|dept=500|empName=Alice Wong|Addr:8200 Warden Ave,"Markham, Ont",L3G 1H7|tel=905-347-5649|sal=135599.95)%CR;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package io.github.openDFDL
+package org.apache.daffodil.tdml.processor
 
 import java.io.{ FileNotFoundException, InputStream, ByteArrayOutputStream }
 import java.net.URI
@@ -23,7 +23,6 @@ import java.net.URI
 import org.apache.daffodil.api.{ DataLocation, URISchemaSource, ValidationMode, Diagnostic, DaffodilSchemaSource }
 import org.apache.daffodil.exceptions.Assert
 import org.apache.daffodil.externalvars.Binding
-import org.apache.daffodil.tdml.processor.{ TDMLParseResult, TDMLDFDLProcessor, TDMLUnparseResult, TDML, TDMLDFDLProcessorFactory }
 import org.apache.daffodil.util.Maybe
 import org.apache.daffodil.xml.DFDLCatalogResolver
 import org.apache.daffodil.util.LoggingDefaults
@@ -45,6 +44,7 @@ import com.ibm.dfdl.processor.IDFDLSerializer
 import java.io.StringReader
 import org.apache.commons.io.input.ReaderInputStream
 import com.ibm.dfdl.processor.IDFDLProcessor
+import com.ibm.dfdl.sample.PrintTraceListener
 
 object IBMDFDLMode extends Enumeration {
   type Type = Value
@@ -110,9 +110,11 @@ class IBMTDMLDiagnostic(iddArg: IDFDLDiagnostic, throwable: Throwable, mode: IBM
 
 }
 
-class IBM_DFDL
+class DaffodilTDMLDFDLProcessorFactory()
   extends TDMLDFDLProcessorFactory
   with DiagnosticsMixin {
+
+  override def implementationName = "ibm"
 
   private var checkAllTopLevel: Boolean = false
 
@@ -232,6 +234,20 @@ class IBMTDMLDFDLProcessor(
   extends TDMLDFDLProcessor
   with DiagnosticsMixin {
 
+  override def setDebugging(onOff: Boolean): Unit = {
+    if (onOff) ???
+  }
+
+  private var isTraceMode = false
+
+  override def setTracing(onOff: Boolean): Unit = {
+    isTraceMode = onOff
+  }
+
+  override def setDebugger(db: AnyRef): Unit = {
+    ???
+  }
+
   private def processorFactory = new DFDLProcessorFactory
 
   val DFDL_NAMESPACE = "http://www.ogf.org/dfdl/dfdl-1.0/"
@@ -264,8 +280,6 @@ class IBMTDMLDFDLProcessor(
       parser.setVariable(varName, ns, varValue)
     }
 
-    // is.mark(Integer.MAX_VALUE) // WHY IS THIS NEEDED
-
     val saxInput = new InputSource(is)
     val saxErrorHandler = parseErrorHandler
     val sb = new java.lang.StringBuilder
@@ -275,6 +289,12 @@ class IBMTDMLDFDLProcessor(
     dfdlReader.setErrorHandler(saxErrorHandler)
     dfdlReader.setFeature(DFDLReader.SAX_FEATURE_NAMESPACES, true)
     dfdlReader.setFeature(DFDLReader.SAX_FEATURE_VALIDATION, shouldValidate)
+
+    if (isTraceMode) {
+      // add a trace listener
+      val traceListener = new PrintTraceListener()
+      parser.addUserTraceListener(traceListener)
+    }
 
     dfdlReader.parse(saxInput)
 
@@ -299,6 +319,12 @@ class IBMTDMLDFDLProcessor(
     serializer.setOutputDocument(outputStream)
 
     serializer.setFeature(IDFDLProcessor.DFDL_FEATURE_VALIDATION, shouldValidate)
+
+    if (isTraceMode) {
+      // add a trace listener
+      val traceListener = new PrintTraceListener()
+      serializer.addUserTraceListener(traceListener)
+    }
 
     val errorHandler = unparseErrorHandler
     serializer.setErrorHandler(errorHandler)
@@ -374,4 +400,3 @@ final class IBMTDMLUnparseResult(diags: Seq[IBMTDMLDiagnostic])
 
   override def bitPos0b: Long = finalBitPos0b
 }
-

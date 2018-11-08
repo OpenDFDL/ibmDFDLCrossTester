@@ -4,7 +4,7 @@
               xmlns:ex="http://example.com"
               xmlns:tdml="http://www.ibm.com/xmlns/dfdl/testData"
               xmlns:ibmDfdlExtn="http://www.ibm.com/dfdl/extensions"
-              defaultImplementations="io.github.openDFDL.IBM_DFDL daffodil"
+              defaultImplementations="ibm daffodil"
               defaultRoundTrip="onePass">
 
   <tdml:parserTestCase name="test1" root="r" model="crossTestRigTestSchema.dfdl.xsd">

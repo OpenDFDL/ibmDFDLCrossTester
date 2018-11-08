@@ -15,12 +15,9 @@
 	<classpathentry kind="lib" path="lib/icu4j.jar"/>
 	<classpathentry kind="lib" path="lib/scd.jar"/>
 	<classpathentry kind="lib" path="lib/xsd_2.6.0.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/daffodil-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/daffodil-io"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/daffodil-lib"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/daffodil-macro-lib"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/daffodil-runtime1"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/daffodil-runtime1-unparser"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/daffodil-tdml"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/daffodil-macro-lib"/>
 	<classpathentry kind="output" path="target/scala-2.12/classes"/>
 </classpath>
