@@ -110,8 +110,8 @@ class IBMTDMLDiagnostic(iddArg: IDFDLDiagnostic, throwable: Throwable, mode: IBM
 
 }
 
-class DaffodilTDMLDFDLProcessorFactory()
-  extends TDMLDFDLProcessorFactory
+class TDMLDFDLProcessorFactory()
+  extends AbstractTDMLDFDLProcessorFactory
   with DiagnosticsMixin {
 
   override def implementationName = "ibm"
