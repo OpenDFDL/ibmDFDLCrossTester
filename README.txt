@@ -6,7 +6,7 @@ cross testing of tests easily against both Daffodl and the IBM DFDL implementati
 Requirements
 
 IBM DFDL - a developer edition is available. 
-Daffodil - snapshot of 2.3.0 development branch as of at least 2018-10-30 or a newer release
+Daffodil - snapshot of 2.3.0 development branch as of at least 2018-11-19 or a newer release
 
 How to Install
 
@@ -62,10 +62,10 @@ Create the jar file for the tool by doing
 
   sbt package
   
-Then put the jar onto the class path, along with the lib directory, and then 
+Then put the jar onto the class path, along with all jars of the lib directory, and then 
 any tests run as part of daffodil can be cross tested against IBM DFDL by just
-adding implementations="io.github.openDFDL.IBM_DFDL daffodil" (to test on both),
-or for a whole test suite: defaultImplementations="io.github.openDFDL.IBM_DFDL daffodil".
+adding implementations="ibm daffodil" (to test on both),
+or for a whole test suite: defaultImplementations="ibm daffodil".
 
 See the company.tdml or company1SelfContained.tdml files for examples of this
 TDML syntax.
