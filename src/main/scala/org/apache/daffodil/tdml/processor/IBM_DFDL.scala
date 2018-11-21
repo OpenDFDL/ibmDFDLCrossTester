@@ -47,6 +47,8 @@ import java.io.StringReader
 import org.apache.commons.io.input.ReaderInputStream
 import com.ibm.dfdl.processor.IDFDLProcessor
 import com.ibm.dfdl.sample.PrintTraceListener
+import org.apache.daffodil.xml.XMLUtils
+import scala.xml.Utility
 
 object IBMDFDLMode extends Enumeration {
   type Type = Value
@@ -335,7 +337,26 @@ class IBMTDMLDFDLProcessor(
     val inputStream = new ReaderInputStream(new StringReader(infosetString), "UTF-8")
 
     val saxInput = new InputSource(inputStream)
-    val saxContentHandler = new SAXToDFDLEventAdapter(serializer)
+
+    val saxContentHandler = new SAXToDFDLEventAdapter(serializer) {
+
+      /**
+       * Is called with characters where XML character entities have already been
+       * converted to characters.
+       *
+       * However, we have special use of PUA characters to represent XML-illegal
+       * code points that must also be inverted.
+       *
+       * E.g., U+E000 must become NUL (aka code point zero)
+       */
+      private val remapper = XMLUtils.remapPUAToXMLIllegalChar(false) _
+
+      override def characters(ch: Array[Char], start: Int, length: Int): Unit = {
+        val withoutPUAsArray = ch.map { remapper(_) }
+        super.characters(withoutPUAsArray, start, length)
+      }
+    }
+
     val saxErrorHandler = unparseErrorHandler
 
     val myReader = XMLReaderFactory.createXMLReader()
