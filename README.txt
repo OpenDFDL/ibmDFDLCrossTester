@@ -3,19 +3,38 @@ ibmDFDLCrossTester
 This is a test rig that drives Daffodil TDML tests against IBM DFDL enabling
 cross testing of tests easily against both Daffodl and the IBM DFDL implementation.
 
+The purpose of this tool is to help demonstrate interoperability of IBM DFDL and
+Daffodil for the overlapping subset of DFDL that both implement. This will drive
+convergence of the two implementations so that DFDL users can reliably create 
+portable DFDL schemas. 
+
+Similar cross testers can be created for other DFDL implementations as well. 
+
 Requirements
 
-IBM DFDL - a developer edition is available. 
-Daffodil - snapshot of 2.3.0 development branch as of at least 2018-11-19 or a newer release
+* IBM DFDL - Note that a developer edition is available. 
+* Daffodil - Version 2.3.0 
 
 How to Install
 
-Edit the build.sbt file so that the daffodil dependency requests the right version of Daffodil. 
-If using a development snapshot, the dependency will end with something like "2.3.0-SNAPSHOT", and 
-you must insure that you have a locally published snapshot of that branch.
+Edit the build.sbt file so that the daffodil dependency requests the
+right version of Daffodil.
 
-Download and install the developer edition of IBM. (Tested using ace-11.0.0.1)
-In it is a DFDL jar that you can open up.
+The first released version of Daffodil with support for cross-testing
+is 2.3.0.
+
+(Note: As of this writing, version 2.3.0 is not yet released, so a
+development snapshot must be used. If using a development snapshot,
+the dependency will end with something like "2.3.0-SNAPSHOT" or maybe
+"latest.integration". You must insure that you have a locally
+published snapshot of that branch - that is, do sbt publishLocal.)
+
+Download and install the developer edition of IBM DFDL.
+
+This is part of the IBM App Connect Enterprise (ACE) product.
+This cross test rig was originally created and tested against IBM ACE-11.0.0.1.
+
+In the IBM ACE product you will find a DFDL jar that you can open up.
 
 Copy the IBM DFDL jars into the 'lib' subdirectory of this project.
 
@@ -35,8 +54,13 @@ lib
 ├── scd.jar
 └── xsd_2.6.0.jar
 
+Copying the Samples
+
 Copy the data files company.xml, company.txt, and company.xsd into src/test/resources.
 Copy the schema file IBMdefined/RecordSeparatedFieldFormat.xsd into src/test/resources/IBMdefined.
+
+These are examples created by IBM which this test rig will invoke using TDML to show that
+everything is working properly.
 
 The resulting tree under src/test/resources will look like:
 
@@ -46,36 +70,32 @@ src/test/resources/
 ├── company.txt (copy from IBM DFDL)
 ├── company.xml (copy from IBM DFDL)
 ├── company.xsd (copy from IBM DFDL)
-├── crossTestRigTestSchema.dfdl.xsd - supplied by this cross test rig.
-├── crossTestRigTests.tdml          - supplied by this cross test rig.
+├── crossTestRigTestSchema.dfdl.xsd - supplied by this cross test rig, to test the rig itself.
+├── crossTestRigTests.tdml          - supplied by this cross test rig, to test the rig itself.
 └── IBMdefined
     └── RecordSeparatedFieldFormat.xsd (copy from IBM DFDL)
-
 
 Now you should be able to run the example tests using 'sbt' by typing:
 
   sbt test
 
-In the root directory of the project. 
+In the root directory of this project. This will run the test-rig's own self-tests, and 
+run two versions of the IBM-supplied example tests. One version is with a TDML file, company.tdml,
+which refers to the separate files supplied by IBM. 
 
-Create the jar file for the tool by doing
-
-  sbt package
-  
-Then put the jar onto the class path, along with all jars of the lib directory, and then 
-any tests run as part of daffodil can be cross tested against IBM DFDL by just
-adding implementations="ibm daffodil" (to test on both),
-or for a whole test suite: defaultImplementations="ibm daffodil".
-
-See the company.tdml or company1SelfContained.tdml files for examples of this
-TDML syntax.
-
-The Tests
-
-There are tests of the test rig itself.
-
-The "company" example supplied by IBM is provided here by way of showing how to create TDML tests that run against IBM DFDL, Daffodil, or both.
+The other is an example of a self-contained
+test. It's the same test, just with the file contents collapsed into the TDML file. This is 
+just a useful thing to know about for creating small bug-report TDML files, or for creating
+a TDML file that illustrates a non-portability issue.
 
 See TestIBMDFDLSamples.scala, company.tdml, companySelfContained.tdml.
+
+Testing Other Test Suites
+
+To use this cross-tester and run other test suites such as those in daffodil
+(for example daffodil-test-ibm1, or daffodil-test), look at the 
+build.sbt file of this module, and add new test source directories and
+test resource directories as suggested there.
+
 
 
