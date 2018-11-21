@@ -38,6 +38,19 @@ unmanagedResourceDirectories in Test += baseDirectory.value /
 //   ".." / "daffodil" /  "daffodil-test" / "src" / "test" / "resources"
 //
 
+//
+// Add DFDLSchemas/NACHA 
+// 
+unmanagedSourceDirectories in Test ++= Seq(
+   baseDirectory.value / ".." / "DFDLSchemas" /  "NACHA" / "2013" / "src" / "test" / "scala",
+)
+
+unmanagedResourceDirectories in Test ++= Seq(
+   baseDirectory.value / ".." / "DFDLSchemas" /  "NACHA" / "2013" ,
+   baseDirectory.value / ".." / "DFDLSchemas" /  "NACHA" / "2013" / "src" / "test" / "resources",
+)
+
+
 libraryDependencies in ThisBuild := Seq(
   "junit" % "junit" % "4.11" % "test",
   "com.novocode" % "junit-interface" % "0.11" % "test",

@@ -33,7 +33,9 @@ import com.ibm.dfdl.grammar.{ IDFDLGrammar, DFDLGrammarFactory }
 import com.ibm.dfdl.processor.exceptions.DFDLException
 import org.xml.sax.{ XMLReader, SAXException, ErrorHandler, InputSource, SAXParseException, ContentHandler }
 import com.ibm.dfdl.sample.sax.reader
-import com.ibm.dfdl.sample.sax.reader.{ DFDLReader, XMLSAXContentHandler }
+import com.ibm.dfdl.sample.sax.reader.DFDLReader1 // HAS BUG FIX IN IT
+import com.ibm.dfdl.sample.sax.reader.DFDLReader
+import com.ibm.dfdl.sample.sax.reader.XMLSAXContentHandler
 
 import scala.xml.Node
 import org.apache.daffodil.xml.DaffodilXMLLoader
@@ -284,7 +286,7 @@ class IBMTDMLDFDLProcessor(
     val saxErrorHandler = parseErrorHandler
     val sb = new java.lang.StringBuilder
     val saxContentHandler = new XMLSAXContentHandler(sb)
-    val dfdlReader = new DFDLReader(parser) // implements the SAX XMLReader interface but uses a DFDL parser
+    val dfdlReader = new DFDLReader1(parser) // implements the SAX XMLReader interface but uses a DFDL parser
     dfdlReader.setContentHandler(saxContentHandler)
     dfdlReader.setErrorHandler(saxErrorHandler)
     dfdlReader.setFeature(DFDLReader.SAX_FEATURE_NAMESPACES, true)
