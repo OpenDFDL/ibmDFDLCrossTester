@@ -46,7 +46,7 @@ import com.ibm.dfdl.processor.IDFDLSerializer
 import java.io.StringReader
 import org.apache.commons.io.input.ReaderInputStream
 import com.ibm.dfdl.processor.IDFDLProcessor
-import com.ibm.dfdl.sample.PrintTraceListener
+import io.github.openDFDL.TraceListener
 import org.apache.daffodil.xml.XMLUtils
 import scala.xml.Utility
 
@@ -127,6 +127,8 @@ class TDMLDFDLProcessorFactory()
   override def validateDFDLSchemas = validateDFDLSchemas_
 
   override def setValidateDFDLSchemas(bool: Boolean): Unit = {
+    if (bool == false)
+      System.err.println("In this test rig, IBM DFDL always validates DFDL schemas. This cannot be turned off.")
     this.validateDFDLSchemas_ = bool
   }
 
@@ -157,11 +159,14 @@ class TDMLDFDLProcessorFactory()
     throw exc
   }
 
+  private val traceListener = new TraceListener()
+
   override def getProcessor(schemaSource: DaffodilSchemaSource, useSerializedProcessor: Boolean): TDML.CompileResult = {
     // Construct a grammar from the DFDL schema
     val grammarErrorHandler = compileErrorHandler
     val grammarFactory = new DFDLGrammarFactory
     grammarFactory.setErrorHandler(grammarErrorHandler)
+    grammarFactory.setServiceTraceListener(traceListener)
     val schemaUri: URI = schemaSource.uriForLoading
     Assert.invariant(schemaSource.isInstanceOf[URISchemaSource])
     val grammar =
@@ -169,6 +174,14 @@ class TDMLDFDLProcessorFactory()
         // LoggingDefaults.setLoggingLevel(LogLevel.Resolver)
         val er = DFDLCatalogResolver.get
         // System.err.println("Using Daffodil Entity Resolver")
+        //
+        // We insist that we validate schemas, always.
+        // This is supposed to be the default.
+        //
+        Assert.invariant {
+          val state = grammarFactory.getFeature(DFDLGrammarFactory.DFDL_FEATURE_SCHEMA_VALIDATION)
+          state == true
+        }
         grammarFactory.buildGrammarFromSchema(schemaUri, er)
       } catch {
         case e: DFDLException => {
@@ -238,6 +251,8 @@ class IBMTDMLDFDLProcessor(
   extends TDMLDFDLProcessor
   with DiagnosticsMixin {
 
+  private val traceListener = new TraceListener()
+
   override def setDebugging(onOff: Boolean): Unit = {
     if (onOff) ???
   }
@@ -296,8 +311,8 @@ class IBMTDMLDFDLProcessor(
 
     if (isTraceMode) {
       // add a trace listener
-      val traceListener = new PrintTraceListener()
       parser.addUserTraceListener(traceListener)
+      parser.addServiceTraceListener(traceListener)
     }
 
     dfdlReader.parse(saxInput)
@@ -326,8 +341,8 @@ class IBMTDMLDFDLProcessor(
 
     if (isTraceMode) {
       // add a trace listener
-      val traceListener = new PrintTraceListener()
       serializer.addUserTraceListener(traceListener)
+      serializer.addServiceTraceListener(traceListener)
     }
 
     val errorHandler = unparseErrorHandler
