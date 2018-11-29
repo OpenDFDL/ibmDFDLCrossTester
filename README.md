@@ -1,7 +1,9 @@
-ibmDFDLCrossTester
+# IBM DFDL Cross Tester for Daffodil
 
-This is a test rig that drives Daffodil TDML tests against IBM DFDL enabling
+This is a test rig that drives TDML tests against IBM DFDL enabling
 cross testing of tests easily against both Daffodl and the IBM DFDL implementation.
+It uses the TDML Runner library from Daffodil, and complements that with a IBM-specific
+TDML processor which drives IBM DFDL from Daffodil's TDML dialect test files. 
 
 The purpose of this tool is to help demonstrate interoperability of IBM DFDL and
 Daffodil for the overlapping subset of DFDL that both implement. This will drive
@@ -93,9 +95,37 @@ See TestIBMDFDLSamples.scala, company.tdml, companySelfContained.tdml.
 Testing Other Test Suites
 
 To use this cross-tester and run other test suites such as those in daffodil
-(for example daffodil-test-ibm1, or daffodil-test), look at the 
-build.sbt file of this module, and add new test source directories and
-test resource directories as suggested there.
+or those for the DFDLSchemas projects on github, you must publish the Jar file for it, so 
+that other software modules can find it. To do this issue the command:
+
+     sbt publishLocal
+
+You must also setup the 
+sbt plugin that makes it easy to use this cross test rig. To do this, copy the file
+ibmDFDLCrossTesterSBTPlugin.scala into your ~/.sbt/1.0/plugins directory, and edit it
+to provide the path name to the "lib" directory (see comments in the file). 
+
+This sbt plugin enables one to easily run a DFDL schema project against Daffodil
+or IBM by changing only one line in the build.sbt file.
+
+This is perhaps best understood by example. See the build.sbt file in the DFDLSchemas
+NACHA schema. You'll find a comment like this:
+
+    ).
+    settings(nachaSettings)
+    //
+    // Uncomment this line below to run against IBM DFDL.
+    // You need to have IBM DFDL installed and the IBM DFDL Cross Tester
+    // 
+    //.settings(IBMDFDLCrossTesterPlugin.settings)
+
+If you uncomment that final line, the plugin will modify the classpath so that
+the IBM DFDL Cross Tester's ibm-tdml-processor will be used instead of the daffodil-tdml-processor. Then when you run 'sbt test' it will use IBM DFDL to run the tests.
+Keep in mind the tests must have "ibm" as a member of a TDML testSuite defaultImplementations attribute, or a TDML parserTestCase or unparserTestCase implementations attribute. Otherwise the test is skipped for that implementation. Tests intended to be portable should list defaultImplementations="ibm daffodil" (or on the test case, implemenations="ibm daffodil") so that both implementations will attempt to run the test. A test that works only on one of the implementations should leave out the other implementation. 
+
+If you search the daffodil daffodil-test-ibm1 module for "defaultImplementations" or "implementations" you'll find examples of how TDML files do this.
+
+
 
 
 
