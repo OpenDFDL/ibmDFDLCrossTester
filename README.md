@@ -44,6 +44,7 @@ You must also copy the samples/dfdlsample_java.jar into the 'lib' subdirectory, 
 
 The resulting directory looks like this.
 
+```
 lib
 ├── dfdlsample_java.jar
 ├── emf.common_2.6.0.jar
@@ -55,6 +56,7 @@ lib
 ├── icu4j.jar
 ├── scd.jar
 └── xsd_2.6.0.jar
+```
 
 Copying the Samples
 
@@ -66,6 +68,7 @@ everything is working properly.
 
 The resulting tree under src/test/resources will look like:
 
+```
 src/test/resources/
 ├── companySelfContained.tdml       - supplied by this cross test rig.
 ├── company.tdml                    - supplied by this cross test rig.
@@ -76,10 +79,11 @@ src/test/resources/
 ├── crossTestRigTests.tdml          - supplied by this cross test rig, to test the rig itself.
 └── IBMdefined
     └── RecordSeparatedFieldFormat.xsd (copy from IBM DFDL)
+```
 
 Now you should be able to run the example tests using 'sbt' by typing:
 
-  sbt test
+  `sbt test`
 
 In the root directory of this project. This will run the test-rig's own self-tests, and 
 run two versions of the IBM-supplied example tests. One version is with a TDML file, company.tdml,
@@ -98,11 +102,11 @@ To use this cross-tester and run other test suites such as those in daffodil
 or those for the DFDLSchemas projects on github, you must publish the Jar file for it, so 
 that other software modules can find it. To do this issue the command:
 
-     sbt publishLocal
-
+  `sbt publishLocal`
+     
 You must also setup the 
 sbt plugin that makes it easy to use this cross test rig. To do this, copy the file
-ibmDFDLCrossTesterSBTPlugin.scala into your ~/.sbt/1.0/plugins directory, and edit it
+ibmDFDLCrossTesterSBTPlugin.scala into your `~/.sbt/1.0/plugins` directory, and edit it
 to provide the path name to the "lib" directory (see comments in the file). 
 
 This sbt plugin enables one to easily run a DFDL schema project against Daffodil
@@ -111,6 +115,7 @@ or IBM by changing only one line in the build.sbt file.
 This is perhaps best understood by example. See the build.sbt file in the DFDLSchemas
 NACHA schema. You'll find a comment like this:
 
+```
     ).
     settings(nachaSettings)
     //
@@ -118,6 +123,7 @@ NACHA schema. You'll find a comment like this:
     // You need to have IBM DFDL installed and the IBM DFDL Cross Tester
     // 
     //.settings(IBMDFDLCrossTesterPlugin.settings)
+```
 
 If you uncomment that final line, the plugin will modify the classpath so that
 the IBM DFDL Cross Tester's ibm-tdml-processor will be used instead of the daffodil-tdml-processor. Then when you run 'sbt test' it will use IBM DFDL to run the tests.
