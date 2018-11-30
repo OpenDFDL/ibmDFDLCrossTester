@@ -17,38 +17,43 @@
 
 package org.apache.daffodil.tdml.processor
 
-import java.io.{ FileNotFoundException, InputStream, ByteArrayOutputStream }
+import java.io.StringReader
 import java.net.URI
 
-import org.apache.daffodil.api.{ DataLocation, URISchemaSource, ValidationMode, Diagnostic, DaffodilSchemaSource }
+import scala.xml.Node
+
+import org.apache.commons.io.input.ReaderInputStream
+import org.apache.daffodil.api.DaffodilSchemaSource
+import org.apache.daffodil.api.DataLocation
+import org.apache.daffodil.api.Diagnostic
+import org.apache.daffodil.api.URISchemaSource
+import org.apache.daffodil.api.ValidationMode
 import org.apache.daffodil.exceptions.Assert
 import org.apache.daffodil.externalvars.Binding
 import org.apache.daffodil.util.Maybe
 import org.apache.daffodil.xml.DFDLCatalogResolver
-import org.apache.daffodil.util.LoggingDefaults
-import org.apache.daffodil.util.LogLevel
-import com.ibm.dfdl.processor.{ IDFDLDiagnostic, IDFDLErrorHandler, IDFDLParser, IDFDLProcessorErrorHandler, DFDLProcessorFactory }
-import com.ibm.dfdl.processor.types.DFDLDiagnosticType
-import com.ibm.dfdl.grammar.{ IDFDLGrammar, DFDLGrammarFactory }
-import com.ibm.dfdl.processor.exceptions.DFDLException
-import org.xml.sax.{ XMLReader, SAXException, ErrorHandler, InputSource, SAXParseException, ContentHandler }
-import com.ibm.dfdl.sample.sax.reader
-import com.ibm.dfdl.sample.sax.reader.DFDLReader1 // HAS BUG FIX IN IT
-import com.ibm.dfdl.sample.sax.reader.DFDLReader
-import com.ibm.dfdl.sample.sax.reader.XMLSAXContentHandler
-
-import scala.xml.Node
-import org.apache.daffodil.xml.DaffodilXMLLoader
+import org.apache.daffodil.xml.XMLUtils
+import org.xml.sax.ErrorHandler
+import org.xml.sax.InputSource
+import org.xml.sax.SAXParseException
 import org.xml.sax.helpers.XMLReaderFactory
 
-import com.ibm.dfdl.sample.sax.writer.SAXToDFDLEventAdapter
-import com.ibm.dfdl.processor.IDFDLSerializer
-import java.io.StringReader
-import org.apache.commons.io.input.ReaderInputStream
+import com.ibm.dfdl.grammar.DFDLGrammarFactory
+import com.ibm.dfdl.grammar.IDFDLGrammar
+import com.ibm.dfdl.processor.DFDLProcessorFactory
+import com.ibm.dfdl.processor.IDFDLDiagnostic
+import com.ibm.dfdl.processor.IDFDLParser
 import com.ibm.dfdl.processor.IDFDLProcessor
+import com.ibm.dfdl.processor.IDFDLProcessorErrorHandler
+import com.ibm.dfdl.processor.exceptions.DFDLException
+import com.ibm.dfdl.processor.types.DFDLDiagnosticType
+// HAS BUG FIX IN IT
+import com.ibm.dfdl.sample.sax.reader.DFDLReader
+import com.ibm.dfdl.sample.sax.reader.XMLSAXContentHandler
+import com.ibm.dfdl.sample.sax.writer.SAXToDFDLEventAdapter
+
 import io.github.openDFDL.TraceListener
-import org.apache.daffodil.xml.XMLUtils
-import scala.xml.Utility
+import io.github.openDFDL.DFDLReader2
 
 object IBMDFDLMode extends Enumeration {
   type Type = Value
@@ -171,9 +176,13 @@ class TDMLDFDLProcessorFactory()
     Assert.invariant(schemaSource.isInstanceOf[URISchemaSource])
     val grammar =
       try {
+        //
+        // Turning on logging here may be helpful to debugging resolver issues
+        // where files aren't being found.
+        //
         // LoggingDefaults.setLoggingLevel(LogLevel.Resolver)
-        val er = DFDLCatalogResolver.get
-        // System.err.println("Using Daffodil Entity Resolver")
+        //
+        val er = DFDLCatalogResolver.get // Note: we're using Daffodil Resolver
         //
         // We insist that we validate schemas, always.
         // This is supposed to be the default.
@@ -242,8 +251,7 @@ trait DiagnosticsMixin {
   }
 }
 
-class IBMTDMLDFDLProcessor(
-  compilerDiags: Seq[IBMTDMLDiagnostic],
+class IBMTDMLDFDLProcessor(compilerDiags: Seq[IBMTDMLDiagnostic],
   grammar: IDFDLGrammar,
   bindings: Seq[Binding],
   optRootName: Option[String],
@@ -303,7 +311,7 @@ class IBMTDMLDFDLProcessor(
     val saxErrorHandler = parseErrorHandler
     val sb = new java.lang.StringBuilder
     val saxContentHandler = new XMLSAXContentHandler(sb)
-    val dfdlReader = new DFDLReader1(parser) // implements the SAX XMLReader interface but uses a DFDL parser
+    val dfdlReader = new DFDLReader2(parser) // implements the SAX XMLReader interface but uses a DFDL parser
     dfdlReader.setContentHandler(saxContentHandler)
     dfdlReader.setErrorHandler(saxErrorHandler)
     dfdlReader.setFeature(DFDLReader.SAX_FEATURE_NAMESPACES, true)

@@ -15,33 +15,6 @@
 		<nature>org.scala-ide.sdt.core.scalanature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>NACHA-main</name>
-			<type>2</type>
-			<locationURI>GIT_ROOT/DFDLSchemas/NACHA/2013</locationURI>
-		</link>
-		<link>
-			<name>NACHA-resources</name>
-			<type>2</type>
-			<locationURI>GIT_ROOT/DFDLSchemas/NACHA/2013/src/test/resources</locationURI>
-		</link>
-		<link>
-			<name>NACHA-scala</name>
-			<type>2</type>
-			<locationURI>GIT_ROOT/DFDLSchemas/NACHA/2013/src/test/scala</locationURI>
-		</link>
-		<link>
-			<name>daffodil-test-ibm1-resources</name>
-			<type>2</type>
-			<locationURI>DAFFODIL_ROOT/daffodil-test-ibm1/src/test/resources</locationURI>
-		</link>
-		<link>
-			<name>dafodil-test-ibm1-scala</name>
-			<type>2</type>
-			<locationURI>DAFFODIL_ROOT/daffodil-test-ibm1/src/test/scala</locationURI>
-		</link>
-	</linkedResources>
 	<variableList>
 		<variable>
 			<name>GIT_ROOT</name>

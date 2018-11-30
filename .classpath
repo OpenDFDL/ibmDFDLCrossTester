@@ -3,11 +3,6 @@
 	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="src/main/scala"/>
-	<classpathentry kind="src" path="daffodil-test-ibm1-resources"/>
-	<classpathentry kind="src" path="dafodil-test-ibm1-scala"/>
-	<classpathentry kind="src" path="NACHA-main"/>
-	<classpathentry kind="src" path="NACHA-resources"/>
-	<classpathentry kind="src" path="NACHA-scala"/>
 	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="src" path="src/test/scala"/>
 	<classpathentry kind="src" path="src/test/resources"/>
@@ -18,8 +13,8 @@
 	<classpathentry kind="lib" path="lib/emf.ecore.xmi_2.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/gpb.jar"/>
 	<classpathentry kind="lib" path="lib/ibm-dfdl.jar"/>
-	<classpathentry kind="lib" path="lib/icu4j-charsets.jar"/>
-	<classpathentry kind="lib" path="lib/icu4j.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/icu4j-charsets.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/icu4j.jar"/>
 	<classpathentry kind="lib" path="lib/scd.jar"/>
 	<classpathentry kind="lib" path="lib/xsd_2.6.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/daffodil-io"/>
