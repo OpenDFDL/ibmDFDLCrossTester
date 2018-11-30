@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tdml:testSuite xmlns:dfdl="http://www.ogf.org/dfdl/dfdl-1.0/"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+              xmlns:ex="http://example.com"
+              xmlns:tdml="http://www.ibm.com/xmlns/dfdl/testData"
+              xmlns:ibmDfdlExtn="http://www.ibm.com/dfdl/extensions"
+              xmlns:recSepFieldsFmt="http://www.ibm.com/dfdl/RecordSeparatedFieldFormat"
+              suiteName="theSuiteName"
+              defaultImplementations="ibm daffodil"
+              defaultRoundTrip="onePass">
+
+<tdml:defineSchema name="companySchema">
+
+  <xsd:import namespace="http://www.ibm.com/dfdl/RecordSeparatedFieldFormat"
+    schemaLocation="IBMdefined/RecordSeparatedFieldFormat.xsd" />
+
+  <!-- 
+  inside an embedded schema you do not have to surround dfdl:format with annotation/appinfo 
+  -->
+  
+  <dfdl:format encoding="{$dfdl:encoding}" escapeSchemeRef="recSepFieldsFmt:RecordEscapeScheme" occursCountKind="fixed"
+    nilValue="%ES;" nilKind="literalValue" useNilForDefault="no" ref="recSepFieldsFmt:RecordSeparatedFieldsFormat" 
+    binaryNumberCheckPolicy="lax" binaryNumberRep="binary"/>
+
+  <xsd:element ibmDfdlExtn:docRoot="true" name="Company" dfdl:initiator="Company[" dfdl:terminator="]%CR;%LF;">
+    <xsd:complexType>
+      <xsd:sequence dfdl:separator="">
+        <xsd:element name="CompanyName" type="xsd:string" dfdl:initiator="compName=" dfdl:terminator="%CR;%LF;">
+        </xsd:element>
+        <xsd:element dfdl:initiator="Employee(" dfdl:occursCountKind="implicit" maxOccurs="unbounded" name="Employee"
+          dfdl:terminator=")%CR;%LF;">
+          <xsd:complexType>
+            <xsd:sequence dfdl:initiatedContent="yes" dfdl:separator="%#124;" dfdl:separatorPolicy="suppressedAtEndLax">
+              <xsd:element dfdl:initiator="empNum=" name="EmpNo" type="xsd:integer" dfdl:textNumberPattern="#0"
+                ibmDfdlExtn:sampleValue="1" />
+              <xsd:element dfdl:initiator="dept=" nillable="true" name="Dept" type="xsd:integer" ibmDfdlExtn:sampleValue="1"
+                dfdl:textNumberPattern="#0" />
+              <xsd:element default="body_value3" dfdl:initiator="empName=" name="EmpName" type="xsd:string" />
+              <xsd:element dfdl:initiator="Addr:" name="Address">
+                <xsd:complexType>
+                  <xsd:sequence>
+                    <xsd:element name="StreetName" type="xsd:string">
+                    </xsd:element>
+                    <xsd:element name="City" type="xsd:string">
+                    </xsd:element>
+                    <xsd:element name="ZipCode" type="xsd:string">
+                    </xsd:element>
+                  </xsd:sequence>
+                </xsd:complexType>
+              </xsd:element>
+              <xsd:element default="999-999-9999" dfdl:initiator="tel=" name="Tel" ibmDfdlExtn:sampleValue="999-999-9999">
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:pattern value="\d{3}-\d{3}-\d{4}">
+                    </xsd:pattern>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+              <xsd:element dfdl:initiator="sal=" name="Salary" ibmDfdlExtn:sampleValue="1.0" dfdl:textNumberPattern="#0.###">
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:decimal">
+                    <xsd:totalDigits value="8"></xsd:totalDigits>
+                    <xsd:fractionDigits value="2"></xsd:fractionDigits>
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  
+  </tdml:defineSchema>
+
+  <tdml:parserTestCase name="company1" model="companySchema">
+    <tdml:document>
+      <tdml:documentPart type="text" replaceDFDLEntities="true"><![CDATA[Company[compName=My Company%CR;
+Employee(empNum=111111|dept=500|empName=Alice Wong|Addr:8200 Warden Ave,"Markham, Ont",L3G 1H7|tel=905-347-5649|sal=135599.95)%CR;
+Employee(empNum=222222|dept=500|empName=James May|Addr:23 The Cuttings,Chatham,CH2 2PR|tel=208-203-1332|sal=189599.95)%CR;
+Employee(empNum=333333|dept=310|empName=Richard Hammond|Addr:16 Great Windmill,London,W2 3RJ|tel=207-445-2955|sal=599.95)%CR;
+Employee(empNum=444444|dept=230|empName=Jeremy Clarkeson|Addr:"Rose Cottage, Pea Dr",Gloucester,GL01 2NM|tel=743-123-4567|sal=75599.95)%CR;
+Employee(empNum=555555|dept=|empName=Humphrey Littleton|Addr:416 Regent Street,London,NW1 1QT|tel=207-883-1238|sal=99999.95)%CR;
+]%CR;
+]]></tdml:documentPart>
+    </tdml:document>
+    <tdml:infoset>
+      <tdml:dfdlInfoset>
+        <ex:Company>
+          <CompanyName>My Company</CompanyName>
+          <Employee>
+            <EmpNo>111111</EmpNo>
+            <Dept>500</Dept>
+            <EmpName>Alice Wong</EmpName>
+            <Address>
+              <StreetName>8200 Warden Ave</StreetName>
+              <City>Markham, Ont</City>
+              <ZipCode>L3G 1H7</ZipCode>
+            </Address>
+            <Tel>905-347-5649</Tel>
+            <Salary>135599.95</Salary>
+          </Employee>
+          <Employee>
+            <EmpNo>222222</EmpNo>
+            <Dept>500</Dept>
+            <EmpName>James May</EmpName>
+            <Address>
+              <StreetName>23 The Cuttings</StreetName>
+              <City>Chatham</City>
+              <ZipCode>CH2 2PR</ZipCode>
+            </Address>
+            <Tel>208-203-1332</Tel>
+            <Salary>189599.95</Salary>
+          </Employee>
+          <Employee>
+            <EmpNo>333333</EmpNo>
+            <Dept>310</Dept>
+            <EmpName>Richard Hammond</EmpName>
+            <Address>
+              <StreetName>16 Great Windmill</StreetName>
+              <City>London</City>
+              <ZipCode>W2 3RJ</ZipCode>
+            </Address>
+            <Tel>207-445-2955</Tel>
+            <Salary>599.95</Salary>
+          </Employee>
+          <Employee>
+            <EmpNo>444444</EmpNo>
+            <Dept>230</Dept>
+            <EmpName>Jeremy Clarkeson</EmpName>
+            <Address>
+              <StreetName>Rose Cottage, Pea Dr</StreetName>
+              <City>Gloucester</City>
+              <ZipCode>GL01 2NM</ZipCode>
+            </Address>
+            <Tel>743-123-4567</Tel>
+            <Salary>75599.95</Salary>
+          </Employee>
+          <Employee>
+            <EmpNo>555555</EmpNo>
+            <Dept xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"></Dept>
+            <EmpName>Humphrey Littleton</EmpName>
+            <Address>
+              <StreetName>416 Regent Street</StreetName>
+              <City>London</City>
+              <ZipCode>NW1 1QT</ZipCode>
+            </Address>
+            <Tel>207-883-1238</Tel>
+            <Salary>99999.95</Salary>
+          </Employee>
+        </ex:Company>
+      </tdml:dfdlInfoset>
+    </tdml:infoset>
+  </tdml:parserTestCase>
+  
+</tdml:testSuite>

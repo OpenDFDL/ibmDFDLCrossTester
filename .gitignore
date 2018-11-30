@@ -1,0 +1,39 @@
+#
+# NOTE: we're not saving the contents of lib because it is the IBM DFDL binary jars.
+# You get those from IBM. See the README.txt file.
+#
+# Similarly, we're not saving the sample files from the IBM DFDL samples.
+#
+lib/*.jar
+src/test/resources/company.xsd
+src/test/resources/company.xml
+src/test/resources/company.txt
+src/test/resources/IBMdefined/RecordSeparatedFieldFormat.xsd
+*.sbt
+!build.sbt
+.cache-main
+.cache-tests
+target
+target/
+lib_managed
+src_managed
+resource_managed
+.history
+.cache
+.idea
+.idea_modules
+project/errors
+.~*#
+.scala_dependencies
+.settings
+# ignore all emacs backup files
+*~
+#
+# FOR EMACS ENSIME
+#
+.ensime_cache
+# these are autosave emacs files
+\#*#
+.\#*
+.\#.*
+/out/
