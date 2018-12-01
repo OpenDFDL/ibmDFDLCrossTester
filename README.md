@@ -104,9 +104,9 @@ that other software modules can find it. To do this issue the command:
 
   `sbt publishLocal`
      
-You must also setup the 
-sbt plugin that makes it easy to use this cross test rig. To do this, copy the file
-ibmDFDLCrossTesterSBTPlugin.scala into your `~/.sbt/1.0/plugins` directory, and edit it
+You must also setup the sbt plugin that makes it easy to use this cross test rig. 
+To do this, copy the file plugin/ibmDFDLCrossTesterSBTPlugin.scala into 
+your `~/.sbt/1.0/plugins` directory, and edit it
 to provide the path name to the "lib" directory (see comments in the file). 
 
 This sbt plugin enables one to easily run a DFDL schema project against Daffodil
