@@ -259,6 +259,8 @@ class IBMTDMLDFDLProcessor(compilerDiags: Seq[IBMTDMLDiagnostic],
   extends TDMLDFDLProcessor
   with DiagnosticsMixin {
 
+  diagnostics = compilerDiags // don't lose warnings: https://github.com/OpenDFDL/ibmDFDLCrossTester/issues/4
+
   private val traceListener = new TraceListener()
 
   override def setDebugging(onOff: Boolean): Unit = {
