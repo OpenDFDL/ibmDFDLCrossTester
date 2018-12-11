@@ -54,6 +54,7 @@ import com.ibm.dfdl.sample.sax.writer.SAXToDFDLEventAdapter
 
 import io.github.openDFDL.TraceListener
 import io.github.openDFDL.DFDLReader2
+import org.apache.daffodil.tdml.TDMLTestNotCompatibleException
 
 object IBMDFDLMode extends Enumeration {
   type Type = Value
@@ -122,8 +123,6 @@ class IBMTDMLDiagnostic(iddArg: IDFDLDiagnostic, throwable: Throwable, mode: IBM
 class TDMLDFDLProcessorFactory()
   extends AbstractTDMLDFDLProcessorFactory
   with DiagnosticsMixin {
-
-  override def implementationName = "ibm"
 
   private var checkAllTopLevel: Boolean = false
 
@@ -209,6 +208,8 @@ class TDMLDFDLProcessorFactory()
 
 trait DiagnosticsMixin {
 
+  def implementationName: String = "ibm"
+
   def isError: Boolean = diagnostics.exists { _.isError }
 
   def getDiagnostics: Seq[Diagnostic] = diagnostics
@@ -219,14 +220,43 @@ trait DiagnosticsMixin {
 
     override def processingError(diagnostic: IDFDLDiagnostic): Unit = {
       diagnostics = new IBMTDMLDiagnostic(diagnostic, mode) +: diagnostics
+      val msg = diagnostic.getSummary()
+      shortcutError(msg)
+    }
+
+    private def implString = Some(implementationName)
+
+    private val layerProps = Seq("layerLengthUnits", "layerLengthKind", "layerEncoding", "layerTransform")
+    /**
+     * If the message mentions DFDL features clearly unsupported by IBM DFDL,
+     * then the test is skipped.
+     */
+    private def shortcutError(msg: String) {
+      val hasIVC = msg.contains("inputValueCalc")
+      lazy val hasOVC = msg.contains("outputValueCalc")
+      lazy val hasHGR = msg.contains("hiddenGroupRef")
+      if (hasIVC)
+        throw new TDMLTestNotCompatibleException("Test uses dfdl:inputValueCalc", implString)
+      if (hasOVC)
+        throw new TDMLTestNotCompatibleException("Test uses dfdl:outputValueCalc", implString)
+      if (hasHGR)
+        throw new TDMLTestNotCompatibleException("Test uses dfdl:hiddenGroupRef", implString)
+      layerProps.foreach { propName =>
+        if (msg.contains(propName))
+          throw new TDMLTestNotCompatibleException("Test uses dfdl:" + propName, implString)
+      }
     }
 
     override def schemaDefinitionError(diagnostic: IDFDLDiagnostic): Unit = {
       diagnostics = new IBMTDMLDiagnostic(diagnostic, mode) +: diagnostics
+      val msg = diagnostic.getSummary()
+      shortcutError(msg)
     }
 
     override def validationError(diagnostic: IDFDLDiagnostic): Unit = {
       diagnostics = new IBMTDMLDiagnostic(diagnostic, mode) +: diagnostics
+      val msg = diagnostic.getSummary()
+      shortcutError(msg)
     }
 
     override def warning(diagnostic: IDFDLDiagnostic): Unit = {
