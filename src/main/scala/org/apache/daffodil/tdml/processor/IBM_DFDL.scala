@@ -111,11 +111,11 @@ class IBMTDMLDiagnostic(iddArg: IDFDLDiagnostic, throwable: Throwable, mode: IBM
    * This is combined with the word "Error" or "Warning"
    */
   override protected def modeName: String = idd.getType match {
-    case DFDLDiagnosticType.PROCESSINGERROR => mode.toString()
+    case DFDLDiagnosticType.PROCESSINGERROR       => mode.toString()
     case DFDLDiagnosticType.SCHEMADEFINITIONERROR => "Schema Definition"
-    case DFDLDiagnosticType.RECOVERABLEERROR => mode.toString()
-    case DFDLDiagnosticType.WARNING => mode.toString()
-    case DFDLDiagnosticType.VALIDATIONERROR => mode.toString()
+    case DFDLDiagnosticType.RECOVERABLEERROR      => mode.toString()
+    case DFDLDiagnosticType.WARNING               => mode.toString()
+    case DFDLDiagnosticType.VALIDATIONERROR       => mode.toString()
   }
 
 }
@@ -282,10 +282,10 @@ trait DiagnosticsMixin {
 }
 
 class IBMTDMLDFDLProcessor(compilerDiags: Seq[IBMTDMLDiagnostic],
-  grammar: IDFDLGrammar,
-  bindings: Seq[Binding],
-  optRootName: Option[String],
-  rootNamespace: String)
+                           grammar:       IDFDLGrammar,
+                           bindings:      Seq[Binding],
+                           optRootName:   Option[String],
+                           rootNamespace: String)
   extends TDMLDFDLProcessor
   with DiagnosticsMixin {
 
@@ -315,9 +315,9 @@ class IBMTDMLDFDLProcessor(compilerDiags: Seq[IBMTDMLDiagnostic],
 
   override def setValidationMode(validationMode: ValidationMode.Type): Unit = {
     shouldValidate = validationMode match {
-      case ValidationMode.Full => true
+      case ValidationMode.Full    => true
       case ValidationMode.Limited => true
-      case ValidationMode.Off => false
+      case ValidationMode.Off     => false
     }
   }
 
@@ -325,8 +325,7 @@ class IBMTDMLDFDLProcessor(compilerDiags: Seq[IBMTDMLDiagnostic],
 
     val parser: IDFDLParser = processorFactory.createParser
     parser.setGrammar(grammar)
-    parser.setRootElement(
-      optRootName.getOrElse(Assert.usageError("Must call setDistinguishedRootNode before parse.")),
+    parser.setRootElement(optRootName.getOrElse(Assert.usageError("Must call setDistinguishedRootNode before parse.")),
       rootNamespace)
 
     parser.setVariable("encoding", DFDL_NAMESPACE, "ISO-8859-1")
@@ -351,7 +350,7 @@ class IBMTDMLDFDLProcessor(compilerDiags: Seq[IBMTDMLDiagnostic],
 
     if (isTraceMode) {
       // add a trace listener
-      parser.addUserTraceListener(traceListener)
+      // parser.addUserTraceListener(traceListener) // don't need both user and service trace listener.
       parser.addServiceTraceListener(traceListener)
     }
 
