@@ -196,7 +196,7 @@ class TDMLDFDLProcessorFactory()
           toss(e)
         }
       }
-    if (grammar == null) {
+    if (grammar == null || getDiagnostics.exists(_.isError)) {
       Left(getDiagnostics)
     } else {
       Right((getDiagnostics, new IBMTDMLDFDLProcessor(diagnostics, grammar, bindings, optRootName, rootNamespace)))
