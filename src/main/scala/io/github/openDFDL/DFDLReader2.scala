@@ -65,16 +65,14 @@ class DFDLReader2(val parser: IDFDLParser) extends DFDLReader(parser) {
       throw new SAXNotRecognizedException("Unrecognized feature: " + featureId)
   }
 
-  override def parse(input: InputSource) = {
+  override def parse(input: InputSource): Unit = {
     parser.setInputDocument(input.getByteStream(), false)
     try {
-      if (!parser.parseAll())
-        throw new SAXException("DFDL parsing failed")
+      parser.parseAll()
     } catch {
       case e: DFDLException => {
         val exception = new SAXParseException(input.getSystemId(), null, e)
         saxErrorHandler.fatalError(exception)
-        throw exception
       }
     }
   }
