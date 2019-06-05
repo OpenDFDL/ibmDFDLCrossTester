@@ -7,16 +7,16 @@
 	<classpathentry kind="src" path="src/test/scala"/>
 	<classpathentry kind="src" path="src/test/resources"/>
 	<classpathentry kind="src" path="src/main/java"/>
-	<classpathentry kind="lib" path="lib/dfdlsample_java.jar"/>
-	<classpathentry kind="lib" path="lib/emf.common_2.6.0.jar"/>
-	<classpathentry kind="lib" path="lib/emf.ecore_2.6.1.jar"/>
-	<classpathentry kind="lib" path="lib/emf.ecore.xmi_2.5.0.jar"/>
-	<classpathentry kind="lib" path="lib/gpb.jar"/>
-	<classpathentry kind="lib" path="lib/ibm-dfdl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/dfdlsample_java.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/emf.common_2.6.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/emf.ecore_2.6.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/emf.ecore.xmi_2.5.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gpb.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ibm-dfdl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/icu4j-charsets.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/icu4j.jar"/>
-	<classpathentry kind="lib" path="lib/scd.jar"/>
-	<classpathentry kind="lib" path="lib/xsd_2.6.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/scd.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xsd_2.6.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/daffodil-io"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/daffodil-lib"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/daffodil-tdml-lib"/>

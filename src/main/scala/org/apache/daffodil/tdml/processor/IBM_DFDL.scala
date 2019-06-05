@@ -47,13 +47,14 @@ import com.ibm.dfdl.processor.IDFDLProcessor
 import com.ibm.dfdl.processor.IDFDLProcessorErrorHandler
 import com.ibm.dfdl.processor.exceptions.DFDLException
 import com.ibm.dfdl.processor.types.DFDLDiagnosticType
-// HAS BUG FIX IN IT
+
 import com.ibm.dfdl.sample.sax.reader.DFDLReader
-import com.ibm.dfdl.sample.sax.reader.XMLSAXContentHandler
 import com.ibm.dfdl.sample.sax.writer.SAXToDFDLEventAdapter
 
 import io.github.openDFDL.TraceListener
 import io.github.openDFDL.DFDLReader2
+import io.github.openDFDL.XMLSAXContentHandler1
+
 import org.apache.daffodil.tdml.TDMLTestNotCompatibleException
 
 object IBMDFDLMode extends Enumeration {
@@ -343,7 +344,7 @@ class IBMTDMLDFDLProcessor(
     val saxInput = new InputSource(is)
     val saxErrorHandler = parseErrorHandler
     val sb = new java.lang.StringBuilder
-    val saxContentHandler = new XMLSAXContentHandler(sb)
+    val saxContentHandler = new XMLSAXContentHandler1(sb)
     val dfdlReader = new DFDLReader2(parser) // implements the SAX XMLReader interface but uses a DFDL parser
     dfdlReader.setContentHandler(saxContentHandler)
     dfdlReader.setErrorHandler(saxErrorHandler)
