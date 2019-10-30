@@ -25,12 +25,6 @@ right version of Daffodil.
 The first released version of Daffodil with support for cross-testing
 is 2.3.0.
 
-(Note: As of this writing, version 2.3.0 is not yet released, so a
-development snapshot must be used. If using a development snapshot,
-the dependency will end with something like "2.3.0-SNAPSHOT" or maybe
-"latest.integration". You must insure that you have a locally
-published snapshot of that branch - that is, do sbt publishLocal.)
-
 Download and install the developer edition of IBM DFDL.
 
 This is part of the IBM App Connect Enterprise (ACE) product.
