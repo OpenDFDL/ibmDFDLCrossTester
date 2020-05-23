@@ -62,7 +62,7 @@ object IBMDFDLMode extends Enumeration {
   val Parse, Unparse, Compile, Configuration = Value
 }
 
-class IDFDLDiagFromThrowable(cause: Throwable) extends IDFDLDiagnostic {
+final class IDFDLDiagFromThrowable(cause: Throwable) extends IDFDLDiagnostic {
   Assert.usage(cause ne null)
 
   override def getCode = cause.getClass().getName()
@@ -76,9 +76,10 @@ class IDFDLDiagFromThrowable(cause: Throwable) extends IDFDLDiagnostic {
   override def getType = DFDLDiagnosticType.PROCESSINGERROR
 }
 
-class IBMTDMLDiagnostic(iddArg: IDFDLDiagnostic, throwable: Throwable, mode: IBMDFDLMode.Type) extends Diagnostic(Maybe.Nope, Maybe.Nope,
-  maybeCause = Maybe(throwable),
-  maybeFormatString = Maybe(if (iddArg ne null) iddArg.getSummary() else null)) {
+final class IBMTDMLDiagnostic(iddArg: IDFDLDiagnostic, throwable: Throwable, mode: IBMDFDLMode.Type)
+  extends Diagnostic(Maybe.Nope, Maybe.Nope,
+    maybeCause = Maybe(throwable),
+    maybeFormatString = Maybe(if (iddArg ne null) iddArg.getSummary() else null)) {
 
   lazy val idd: IDFDLDiagnostic =
     if (iddArg ne null) iddArg
@@ -121,41 +122,55 @@ class IBMTDMLDiagnostic(iddArg: IDFDLDiagnostic, throwable: Throwable, mode: IBM
 
 }
 
-class TDMLDFDLProcessorFactory()
+final class TDMLDFDLProcessorFactory private (
+  private var checkAllTopLevel: Boolean,
+  var validateDFDLSchemas: Boolean,
+  private var bindings: Seq[Binding])
   extends AbstractTDMLDFDLProcessorFactory
   with DiagnosticsMixin {
 
-  private var checkAllTopLevel: Boolean = false
+  override protected type R = TDMLDFDLProcessorFactory
 
-  private var validateDFDLSchemas_ : Boolean = true
+  /**
+   * Deprecated methods must be implemented. Some are just stubs though now.
+   */
+  @Deprecated def setCheckAllTopLevel(checkAllTopLevel: Boolean): Unit =
+    this.checkAllTopLevel = checkAllTopLevel
 
-  override def validateDFDLSchemas = validateDFDLSchemas_
+  @Deprecated def setExternalDFDLVariables(externalVarBindings: Seq[Binding]): Unit =
+    this.bindings = externalVarBindings
 
-  override def setValidateDFDLSchemas(bool: Boolean): Unit = {
+  @Deprecated def setTunables(tunables: Map[String, String]): Unit = ???
+
+  @Deprecated def setValidateDFDLSchemas(bool: Boolean): Unit =
+    this.validateDFDLSchemas = bool
+
+  @Deprecated def setDistinguishedRootNode(name: String, namespace: String): Unit = ???
+
+  def this() = this(checkAllTopLevel = false, validateDFDLSchemas = true, bindings = Seq())
+
+  private def copy(
+    checkAllTopLevel: Boolean = checkAllTopLevel,
+    validateDFDLSchemas: Boolean = validateDFDLSchemas,
+    bindings: Seq[Binding] = bindings) =
+    new TDMLDFDLProcessorFactory(checkAllTopLevel, validateDFDLSchemas, bindings)
+
+  override def withValidateDFDLSchemas(bool: Boolean): TDMLDFDLProcessorFactory = {
     if (bool == false)
       System.err.println("In this test rig, IBM DFDL always validates DFDL schemas. This cannot be turned off.")
-    this.validateDFDLSchemas_ = bool
+    copy(validateDFDLSchemas = bool)
   }
 
-  override def setCheckAllTopLevel(checkAllTopLevel: Boolean): Unit = {
-    this.checkAllTopLevel = checkAllTopLevel
-  }
+  override def withCheckAllTopLevel(checkAllTopLevel: Boolean): TDMLDFDLProcessorFactory =
+    copy(checkAllTopLevel = checkAllTopLevel)
 
-  override def setTunables(tunables: Map[String, String]): Unit = {
+  override def withTunables(tunables: Map[String, String]): TDMLDFDLProcessorFactory = {
     System.err.println(tunables.map { t => "Tunable ignored: '%s'".format(t.toString()) }.mkString("\n"))
+    this
   }
 
-  private var bindings: Seq[Binding] = Seq()
-
-  override def setExternalDFDLVariables(externalVarBindings: Seq[Binding]): Unit = { bindings = externalVarBindings }
-
-  private var optRootName: Option[String] = None
-  private var rootNamespace: String = _
-
-  override def setDistinguishedRootNode(name: String, namespace: String): Unit = {
-    optRootName = Some(name)
-    rootNamespace = namespace
-  }
+  override def withExternalDFDLVariables(externalVarBindings: Seq[Binding]): TDMLDFDLProcessorFactory =
+    copy(bindings = externalVarBindings)
 
   private def toss(e: Throwable) = {
     val exc = e
@@ -164,9 +179,16 @@ class TDMLDFDLProcessorFactory()
     throw exc
   }
 
-  private val traceListener = new TraceListener()
+  private lazy val traceListener = new TraceListener()
 
-  override def getProcessor(schemaSource: DaffodilSchemaSource, useSerializedProcessor: Boolean): TDML.CompileResult = {
+  override def getProcessor(
+    schemaSource: DaffodilSchemaSource,
+    useSerializedProcessor: Boolean,
+    optRootName: Option[String],
+    optRootNamespace: Option[String]): TDML.CompileResult = {
+
+    val rootNamespace = optRootNamespace.getOrElse(null)
+
     // Construct a grammar from the DFDL schema
     val grammarErrorHandler = compileErrorHandler
     val grammarFactory = new DFDLGrammarFactory
@@ -207,7 +229,7 @@ class TDMLDFDLProcessorFactory()
   private lazy val compileErrorHandler = new DFDLErrorHandler(IBMDFDLMode.Compile)
 }
 
-trait DiagnosticsMixin {
+sealed trait DiagnosticsMixin {
 
   def implementationName: String = "ibm"
 
@@ -282,46 +304,76 @@ trait DiagnosticsMixin {
   }
 }
 
-class IBMTDMLDFDLProcessor(
+final class IBMTDMLDFDLProcessor private (
   compilerDiags: Seq[IBMTDMLDiagnostic],
   grammar: IDFDLGrammar,
   bindings: Seq[Binding],
   optRootName: Option[String],
-  rootNamespace: String)
+  rootNamespace: String,
+  isTraceMode: Boolean,
+  shouldValidate: Boolean)
   extends TDMLDFDLProcessor
   with DiagnosticsMixin {
 
-  diagnostics = compilerDiags // don't lose warnings: https://github.com/OpenDFDL/ibmDFDLCrossTester/issues/4
+  override protected type R = IBMTDMLDFDLProcessor
 
-  private val traceListener = new TraceListener()
+  def this(
+    compilerDiags: Seq[IBMTDMLDiagnostic],
+    grammar: IDFDLGrammar,
+    bindings: Seq[Binding],
+    optRootName: Option[String],
+    rootNamespace: String) = this(compilerDiags, grammar, bindings, optRootName, rootNamespace, isTraceMode = false,
+    shouldValidate = false)
 
-  override def setDebugging(onOff: Boolean): Unit = {
+  def copy(
+    compilerDiags: Seq[IBMTDMLDiagnostic] = compilerDiags,
+    grammar: IDFDLGrammar = grammar,
+    bindings: Seq[Binding] = bindings,
+    optRootName: Option[String] = optRootName,
+    rootNamespace: String = rootNamespace,
+    isTraceMode: Boolean = isTraceMode,
+    shouldValidate: Boolean = shouldValidate) =
+    new IBMTDMLDFDLProcessor(
+      compilerDiags = compilerDiags,
+      grammar = grammar,
+      bindings = bindings,
+      optRootName = optRootName,
+      rootNamespace = rootNamespace,
+      isTraceMode = isTraceMode,
+      shouldValidate = shouldValidate)
+
+  override def withDebugger(db: Object): IBMTDMLDFDLProcessor = ???
+  override def withDebugging(onOff: Boolean): IBMTDMLDFDLProcessor = {
     if (onOff) ???
+    this
   }
 
-  private var isTraceMode = false
+  override def withExternalDFDLVariables(externalVarBindings: Seq[Binding]): IBMTDMLDFDLProcessor =
+    copy(bindings = externalVarBindings)
 
-  override def setTracing(onOff: Boolean): Unit = {
-    isTraceMode = onOff
-  }
+  override def withTracing(onOff: Boolean): IBMTDMLDFDLProcessor =
+    copy(isTraceMode = onOff)
 
-  override def setDebugger(db: AnyRef): Unit = {
-    ???
-  }
-
-  private def processorFactory = new DFDLProcessorFactory
-
-  val DFDL_NAMESPACE = "http://www.ogf.org/dfdl/dfdl-1.0/"
-
-  private var shouldValidate: Boolean = false
-
-  override def setValidationMode(validationMode: ValidationMode.Type): Unit = {
-    shouldValidate = validationMode match {
+  override def withValidationMode(validationMode: ValidationMode.Type): IBMTDMLDFDLProcessor =
+    copy(shouldValidate = validationMode match {
       case ValidationMode.Full => true
       case ValidationMode.Limited => true
       case ValidationMode.Off => false
-    }
-  }
+    })
+
+  diagnostics = compilerDiags // don't lose warnings: https://github.com/OpenDFDL/ibmDFDLCrossTester/issues/4
+
+  private lazy val traceListener = new TraceListener()
+
+  @Deprecated override def setExternalDFDLVariables(externalVarBindings: Seq[Binding]): Unit = ???
+  @Deprecated override def setDebugging(onOff: Boolean): Unit = ???
+  @Deprecated override def setTracing(onOff: Boolean): Unit = ???
+  @Deprecated override def setValidationMode(validationMode: ValidationMode.Type): Unit = ???
+  @Deprecated override def setDebugger(db: AnyRef): Unit = ???
+
+  private lazy val processorFactory = new DFDLProcessorFactory
+
+  private val DFDL_NAMESPACE = "http://www.ogf.org/dfdl/dfdl-1.0/"
 
   override def parse(is: java.io.InputStream, lengthLimitInBits: Long): TDMLParseResult = {
 
@@ -459,7 +511,7 @@ final class IBMTDMLParseResult(diags: Seq[IBMTDMLDiagnostic], dfdlReader: DFDLRe
 
 }
 
-class IBMTDMLDataLocation(myReader: DFDLReader) extends DataLocation {
+final class IBMTDMLDataLocation(myReader: DFDLReader) extends DataLocation {
   override def isAtEnd = true // shuts off left-over data checks for parsing
 
   override def bitPos1b: Long = -1 // shuts off precise length/position checking for unparsing
