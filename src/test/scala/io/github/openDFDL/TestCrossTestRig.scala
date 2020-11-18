@@ -17,7 +17,7 @@
 
 package io.github.openDFDL
 
-import org.apache.daffodil.tdml.{ DFDLTestSuite, Runner }
+import org.apache.daffodil.tdml.Runner
 import org.junit.Test
 
 object TestCrossTestRig {
@@ -36,5 +36,7 @@ class TestCrossTestRig {
   @Test def testIBMTDML_utest1() { runner.runOneTest("utest1") }
 
   @Test def testIBMTDML_twoPass() { runner.runOneTest("testTwoPass") }
+
+  @Test def testIBMTDML_ptest1_neg() { runner.runOneTest("ptest1-neg") }
 
 }

@@ -2,7 +2,7 @@ name := "ibm-tdml-processor"
  
 organization := "io.github.openDFDL"
  
-version := "0.1.0-SNAPSHOT"
+version := "1.0.0-SNAPSHOT"
 
 scalaVersion := "2.12.11"
  
@@ -10,13 +10,14 @@ parallelExecution in Test := false
 
 testOptions += Tests.Argument(TestFrameworks.JUnit, "-v")
 
-crossScalaVersions := Seq("2.12.11", "2.11.12")
+crossScalaVersions := Seq("2.12.11")
 
 libraryDependencies := Seq(
-  "junit" % "junit" % "4.12" % "test",
+  "junit" % "junit" % "4.13.1" % "test",
   "com.novocode" % "junit-interface" % "0.11" % "test",
-  "org.apache.daffodil" %% "daffodil-tdml-lib" % "2.6.0",
-  "org.scala-lang.modules" %% "scala-xml" % "1.1.0"
+  "org.apache.daffodil" %% "daffodil-tdml-lib" % "3.1.0-SNAPSHOT",
+  "org.scala-lang.modules" %% "scala-xml" % "1.3.0",
+  "javax.xml.bind" % "jaxb-api" % "2.3.1"
 )
 
 excludeDependencies += "com.ibm.icu" % "icu4j"

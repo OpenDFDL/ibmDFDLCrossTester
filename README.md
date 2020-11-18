@@ -15,7 +15,11 @@ Similar cross testers can be created for other DFDL implementations as well.
 Requirements
 
 * IBM DFDL - Note that a developer edition is available. 
-* Daffodil - Version 2.3.0 
+* Daffodil - Version 2.3.0
+
+Note that Daffodil 3.1.0-SNAPSHOT git hash xyzzy or later are necessary for
+TDML parser negative test cases to work properly. Many DFDL schemas do not have
+such tests and will work with older revisions of Daffodil back to 2.3.0.  
 
 How to Install
 
