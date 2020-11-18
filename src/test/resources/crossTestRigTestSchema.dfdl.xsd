@@ -14,5 +14,7 @@
   </xs:annotation>
 
   <xs:element name="r" ibmDfdlExtn:docRoot="true" type="xs:string" dfdl:lengthKind="delimited"/>
-  
+
+  <xs:element name="i" ibmDfdlExtn:docRoot="true" type="xs:int" dfdl:lengthKind="delimited"/>
+
 </xs:schema>

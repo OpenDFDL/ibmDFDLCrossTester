@@ -31,7 +31,8 @@ public class DFDLToSAXEventAdapter1 extends DFDLToSAXEventAdapter {
 	@Override
 	public void elementValue(String value, DFDLSchemaType baseSchemaType) throws DFDLUserException {
 		StringBuilder sb = new StringBuilder();
-		String escapedValue = XMLUtils.escape(value, sb).toString();
+		String valueWithCRLFsToLFAndPUAs = XMLUtils.remapXMLIllegalCharactersToPUA(value);
+		String escapedValue = XMLUtils.escape(valueWithCRLFsToLFAndPUAs, sb).toString();
 		super.elementValue(escapedValue, baseSchemaType);
 	}
 	
