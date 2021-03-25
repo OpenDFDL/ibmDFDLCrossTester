@@ -458,7 +458,7 @@ final class IBMTDMLDFDLProcessor private (
        *
        * E.g., U+E000 must become NUL (aka code point zero)
        */
-      private val remapper = XMLUtils.remapPUAToXMLIllegalChar(false) _
+      private val remapper = XMLUtils.remapPUAToXMLIllegalChar _
 
       override def characters(ch: Array[Char], start: Int, length: Int): Unit = {
         val withoutPUAsArray = ch.map { remapper(_) }
