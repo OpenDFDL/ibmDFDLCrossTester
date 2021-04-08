@@ -20,7 +20,7 @@ object IBMDFDLCrossTesterPlugin extends AutoPlugin {
       //
       "io.github.openDFDL" %% "ibm-tdml-processor" % "latest.integration" % "test"
     ),
-    dependencyClasspath in Test := (dependencyClasspath in Test).value.filter { dep =>
+    Test / dependencyClasspath := (Test / dependencyClasspath).value.filter { dep =>
       //
       // Modifies classpath to exclude daffodil's tdml-processor module
       // and any icu4j dependencies (which conflict between IBM DFDL and Daffodil.
