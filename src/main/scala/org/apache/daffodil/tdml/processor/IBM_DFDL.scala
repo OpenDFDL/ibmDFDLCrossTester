@@ -359,6 +359,7 @@ final class IBMTDMLDFDLProcessor private (
       case ValidationMode.Full => true
       case ValidationMode.Limited => true
       case ValidationMode.Off => false
+      case _ => Assert.usageError("validation mode " + validationMode + " is unsupported.")
     })
 
   diagnostics = compilerDiags // don't lose warnings: https://github.com/OpenDFDL/ibmDFDLCrossTester/issues/4
