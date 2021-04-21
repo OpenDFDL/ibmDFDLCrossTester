@@ -359,6 +359,7 @@ final class IBMTDMLDFDLProcessor private (
       case ValidationMode.Full => true
       case ValidationMode.Limited => true
       case ValidationMode.Off => false
+      case _ => Assert.usageError("validation mode " + validationMode + " is unsupported.")
     })
 
   diagnostics = compilerDiags // don't lose warnings: https://github.com/OpenDFDL/ibmDFDLCrossTester/issues/4
@@ -458,7 +459,7 @@ final class IBMTDMLDFDLProcessor private (
        *
        * E.g., U+E000 must become NUL (aka code point zero)
        */
-      private val remapper = XMLUtils.remapPUAToXMLIllegalChar(false) _
+      private val remapper = XMLUtils.remapPUAToXMLIllegalChar _
 
       override def characters(ch: Array[Char], start: Int, length: Int): Unit = {
         val withoutPUAsArray = ch.map { remapper(_) }
