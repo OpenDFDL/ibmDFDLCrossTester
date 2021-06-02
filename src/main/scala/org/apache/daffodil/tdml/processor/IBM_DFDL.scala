@@ -185,7 +185,8 @@ final class TDMLDFDLProcessorFactory private (
     schemaSource: DaffodilSchemaSource,
     useSerializedProcessor: Boolean,
     optRootName: Option[String],
-    optRootNamespace: Option[String]): TDML.CompileResult = {
+    optRootNamespace: Option[String],
+    tunables: Map[String, String]): TDML.CompileResult = {
 
     val rootNamespace = optRootNamespace.getOrElse(null)
 
