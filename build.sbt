@@ -4,19 +4,19 @@ organization := "io.github.openDFDL"
  
 version := "1.0.0-SNAPSHOT"
 
-scalaVersion := "2.12.11"
+scalaVersion := "2.12.15"
  
-parallelExecution in Test := false
+Test / parallelExecution := false
 
 testOptions += Tests.Argument(TestFrameworks.JUnit, "-v")
 
-crossScalaVersions := Seq("2.12.11")
+crossScalaVersions := Seq("2.12.15")
 
 libraryDependencies := Seq(
   "junit" % "junit" % "4.13.1" % "test",
-  "com.novocode" % "junit-interface" % "0.11" % "test",
-  "org.apache.daffodil" %% "daffodil-tdml-lib" % "3.1.0-SNAPSHOT",
-  "org.scala-lang.modules" %% "scala-xml" % "1.3.0",
+  "com.github.sbt" % "junit-interface" % "0.13.2" % "test",
+  "org.apache.daffodil" %% "daffodil-tdml-lib" % "3.2.0",
+  "org.scala-lang.modules" %% "scala-xml" % "2.0.0",
   "javax.xml.bind" % "jaxb-api" % "2.3.1"
 )
 

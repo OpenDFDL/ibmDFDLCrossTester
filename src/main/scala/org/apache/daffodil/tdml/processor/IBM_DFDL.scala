@@ -19,9 +19,7 @@ package org.apache.daffodil.tdml.processor
 
 import java.io.StringReader
 import java.net.URI
-
 import scala.xml.Node
-
 import org.apache.commons.io.input.ReaderInputStream
 import org.apache.daffodil.api.DaffodilSchemaSource
 import org.apache.daffodil.api.DataLocation
@@ -37,7 +35,6 @@ import org.xml.sax.ErrorHandler
 import org.xml.sax.InputSource
 import org.xml.sax.SAXParseException
 import org.xml.sax.helpers.XMLReaderFactory
-
 import com.ibm.dfdl.grammar.DFDLGrammarFactory
 import com.ibm.dfdl.grammar.IDFDLGrammar
 import com.ibm.dfdl.processor.DFDLProcessorFactory
@@ -47,15 +44,16 @@ import com.ibm.dfdl.processor.IDFDLProcessor
 import com.ibm.dfdl.processor.IDFDLProcessorErrorHandler
 import com.ibm.dfdl.processor.exceptions.DFDLException
 import com.ibm.dfdl.processor.types.DFDLDiagnosticType
-
 import com.ibm.dfdl.sample.sax.reader.DFDLReader
 import com.ibm.dfdl.sample.sax.writer.SAXToDFDLEventAdapter
-
 import io.github.openDFDL.TraceListener
 import io.github.openDFDL.DFDLReader2
 import io.github.openDFDL.XMLSAXContentHandler1
-
+import org.apache.daffodil.api.EmbeddedSchemaSource
 import org.apache.daffodil.tdml.TDMLTestNotCompatibleException
+
+import scala.xml.transform.RewriteRule
+import scala.xml.transform.RuleTransformer
 
 object IBMDFDLMode extends Enumeration {
   type Type = Value
@@ -185,7 +183,8 @@ final class TDMLDFDLProcessorFactory private (
     schemaSource: DaffodilSchemaSource,
     useSerializedProcessor: Boolean,
     optRootName: Option[String],
-    optRootNamespace: Option[String]): TDML.CompileResult = {
+    optRootNamespace: Option[String],
+    tunables: Map[String, String]): TDML.CompileResult = {
 
     val rootNamespace = optRootNamespace.getOrElse(null)
 
@@ -194,8 +193,17 @@ final class TDMLDFDLProcessorFactory private (
     val grammarFactory = new DFDLGrammarFactory
     grammarFactory.setErrorHandler(grammarErrorHandler)
     grammarFactory.setServiceTraceListener(traceListener)
-    val schemaUri: URI = schemaSource.uriForLoading
     Assert.invariant(schemaSource.isInstanceOf[URISchemaSource])
+    //
+    // We must strip file/line/col information off the schema
+    // if present.
+    //
+    val preparedSchemaSource = schemaSource match {
+      case ess: EmbeddedSchemaSource =>
+        EmbeddedSchemaSource(XMLUtility.stripLineColInfo(ess.node), ess.nameHint)
+      case _ => schemaSource
+    }
+    val schemaUri: URI = preparedSchemaSource.uriForLoading
     val grammar =
       try {
         //
@@ -227,6 +235,22 @@ final class TDMLDFDLProcessorFactory private (
   }
 
   private lazy val compileErrorHandler = new DFDLErrorHandler(IBMDFDLMode.Compile)
+}
+
+object XMLUtility {
+  private val removeLineColInfo = new RewriteRule {
+    override def transform(n: Node) = n match {
+      case e: scala.xml.Elem => {
+        e.copy(attributes = n.attributes.filter(a =>
+          (a.prefixedKey != "dafint:" + XMLUtils.COLUMN_ATTRIBUTE_NAME) &&
+            (a.prefixedKey != "dafint:" + XMLUtils.LINE_ATTRIBUTE_NAME) &&
+            (a.prefixedKey != "dafint:" + XMLUtils.FILE_ATTRIBUTE_NAME)))
+      }
+      case _ => n
+    }
+  }
+
+  val stripLineColInfo = new RuleTransformer(removeLineColInfo)
 }
 
 sealed trait DiagnosticsMixin {
@@ -415,8 +439,9 @@ final class IBMTDMLDFDLProcessor private (
     new IBMTDMLParseResult(diagnostics, dfdlReader, sb)
   }
 
-  override def unparse(infosetXML: scala.xml.Node, outputStream: java.io.OutputStream): TDMLUnparseResult = {
+  override def unparse(infosetXMLRaw: scala.xml.Node, outputStream: java.io.OutputStream): TDMLUnparseResult = {
 
+    val infosetXML = XMLUtility.stripLineColInfo(infosetXMLRaw)
     val serializer = processorFactory.createSerializer
     serializer.setGrammar(grammar)
 
