@@ -121,7 +121,7 @@ non-portability issue.
 To use this cross-tester and run other test suites such as those in daffodil
 or those for the DFDLSchemas projects on github, follow these steps:
 
-1. Publish the IBM DFDL Cross Tester jar so hat other software modules can find
+1. Publish the IBM DFDL Cross Tester jar so that other software modules can find
    it, with the following command:
 
    ```
