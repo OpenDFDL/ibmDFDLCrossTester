@@ -1,7 +1,7 @@
 
 package com.ibm.dfdl.sample.sax.reader;
 
-import org.apache.daffodil.xml.XMLUtils;
+import org.apache.daffodil.lib.xml.XMLUtils;
 
 import com.ibm.dfdl.processor.exceptions.DFDLUserException;
 import com.ibm.dfdl.processor.types.DFDLSchemaType;

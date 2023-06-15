@@ -5,11 +5,11 @@
            xmlns:ex="http://example.com"
            xmlns:ibmDfdlExtn="http://www.ibm.com/dfdl/extensions">
            
-  <xs:include schemaLocation="org/apache/daffodil/xsd/DFDLGeneralFormat.dfdl.xsd" />
+  <xs:include schemaLocation="org/apache/daffodil/xsd/DFDLGeneralFormatPortable.dfdl.xsd" />
   
   <xs:annotation>
     <xs:appinfo source="http://www.ogf.org/dfdl/">
-      <dfdl:format ref="ex:GeneralFormat" encodingErrorPolicy="error"/>
+      <dfdl:format ref="ex:GeneralFormat" />
     </xs:appinfo>
   </xs:annotation>
 
