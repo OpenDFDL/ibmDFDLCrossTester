@@ -15,24 +15,30 @@
  * limitations under the License.
  */
 
-package org.apache.daffodil.tdml.processor
+package org.apache.daffodil.processor.tdml
 
 import java.io.StringReader
 import java.net.URI
 
 import scala.xml.Node
+import scala.xml.Elem
+import scala.xml.transform.RuleTransformer
+import scala.xml.transform.RewriteRule
 
 import org.apache.commons.io.input.ReaderInputStream
-import org.apache.daffodil.api.DaffodilSchemaSource
-import org.apache.daffodil.api.DataLocation
-import org.apache.daffodil.api.Diagnostic
-import org.apache.daffodil.api.URISchemaSource
-import org.apache.daffodil.api.ValidationMode
-import org.apache.daffodil.exceptions.Assert
-import org.apache.daffodil.externalvars.Binding
-import org.apache.daffodil.util.Maybe
-import org.apache.daffodil.xml.DFDLCatalogResolver
-import org.apache.daffodil.xml.XMLUtils
+import org.apache.daffodil.lib.api.DaffodilSchemaSource
+import org.apache.daffodil.lib.api.DataLocation
+import org.apache.daffodil.lib.api.Diagnostic
+import org.apache.daffodil.lib.api.EmbeddedSchemaSource
+import org.apache.daffodil.lib.api.URISchemaSource
+import org.apache.daffodil.lib.api.ValidationMode
+import org.apache.daffodil.lib.exceptions.Assert
+import org.apache.daffodil.lib.externalvars.Binding
+import org.apache.daffodil.lib.util.Maybe
+import org.apache.daffodil.lib.xml.DFDLCatalogResolver
+import org.apache.daffodil.lib.xml.XMLUtils
+import org.apache.daffodil.tdml.processor._
+
 import org.xml.sax.ErrorHandler
 import org.xml.sax.InputSource
 import org.xml.sax.SAXParseException
@@ -122,6 +128,28 @@ final class IBMTDMLDiagnostic(iddArg: IDFDLDiagnostic, throwable: Throwable, mod
 
 }
 
+object RemoveDafintTransformer {
+
+  /**
+   * Daffodil inserts line/col information as attributes sometimes, which IBM DFDL cannot
+   * handle. This function removes those attributes
+   */
+  private lazy val transformer = {
+    val removeDafintRule = new RewriteRule() {
+      override def transform(node: Node) = node match {
+        case Elem(prefix, label, attributes, scope, children @ _ *) => {
+          val newAttributes = attributes.filter(!_.prefixedKey.startsWith("dafint:"))
+          new Elem(prefix, label, newAttributes, scope, true, children: _*)
+        }
+        case other => other
+      }
+    }
+    new RuleTransformer(removeDafintRule)
+  }
+
+  def apply(node: Node): Node = transformer(node)
+}
+
 final class TDMLDFDLProcessorFactory private (
   private var checkAllTopLevel: Boolean,
   var validateDFDLSchemas: Boolean,
@@ -130,22 +158,6 @@ final class TDMLDFDLProcessorFactory private (
   with DiagnosticsMixin {
 
   override protected type R = TDMLDFDLProcessorFactory
-
-  /**
-   * Deprecated methods must be implemented. Some are just stubs though now.
-   */
-  @Deprecated def setCheckAllTopLevel(checkAllTopLevel: Boolean): Unit =
-    this.checkAllTopLevel = checkAllTopLevel
-
-  @Deprecated def setExternalDFDLVariables(externalVarBindings: Seq[Binding]): Unit =
-    this.bindings = externalVarBindings
-
-  @Deprecated def setTunables(tunables: Map[String, String]): Unit = ???
-
-  @Deprecated def setValidateDFDLSchemas(bool: Boolean): Unit =
-    this.validateDFDLSchemas = bool
-
-  @Deprecated def setDistinguishedRootNode(name: String, namespace: String): Unit = ???
 
   def this() = this(checkAllTopLevel = false, validateDFDLSchemas = true, bindings = Seq())
 
@@ -169,9 +181,6 @@ final class TDMLDFDLProcessorFactory private (
     this
   }
 
-  override def withExternalDFDLVariables(externalVarBindings: Seq[Binding]): TDMLDFDLProcessorFactory =
-    copy(bindings = externalVarBindings)
-
   private def toss(e: Throwable) = {
     val exc = e
     System.err.println("DFDL exception creating grammar: " + exc.getMessage)
@@ -185,7 +194,8 @@ final class TDMLDFDLProcessorFactory private (
     schemaSource: DaffodilSchemaSource,
     useSerializedProcessor: Boolean,
     optRootName: Option[String],
-    optRootNamespace: Option[String]): TDML.CompileResult = {
+    optRootNamespace: Option[String],
+    tunables: Map[String, String]): TDML.CompileResult = {
 
     val rootNamespace = optRootNamespace.getOrElse(null)
 
@@ -194,7 +204,14 @@ final class TDMLDFDLProcessorFactory private (
     val grammarFactory = new DFDLGrammarFactory
     grammarFactory.setErrorHandler(grammarErrorHandler)
     grammarFactory.setServiceTraceListener(traceListener)
-    val schemaUri: URI = schemaSource.uriForLoading
+    val schemaUri: URI = schemaSource match {
+      case ess: EmbeddedSchemaSource => {
+        val newNode = RemoveDafintTransformer(ess.node)
+        ess.copy(node = newNode).uriForLoading
+      }
+      case ss => schemaSource.uriForLoading
+    }
+
     Assert.invariant(schemaSource.isInstanceOf[URISchemaSource])
     val grammar =
       try {
@@ -366,12 +383,6 @@ final class IBMTDMLDFDLProcessor private (
 
   private lazy val traceListener = new TraceListener()
 
-  @Deprecated override def setExternalDFDLVariables(externalVarBindings: Seq[Binding]): Unit = ???
-  @Deprecated override def setDebugging(onOff: Boolean): Unit = ???
-  @Deprecated override def setTracing(onOff: Boolean): Unit = ???
-  @Deprecated override def setValidationMode(validationMode: ValidationMode.Type): Unit = ???
-  @Deprecated override def setDebugger(db: AnyRef): Unit = ???
-
   private lazy val processorFactory = new DFDLProcessorFactory
 
   private val DFDL_NAMESPACE = "http://www.ogf.org/dfdl/dfdl-1.0/"
@@ -443,7 +454,7 @@ final class IBMTDMLDFDLProcessor private (
     val errorHandler = unparseErrorHandler
     serializer.setErrorHandler(errorHandler)
 
-    val infosetString = infosetXML.toString()
+    val infosetString = RemoveDafintTransformer(infosetXML).toString()
     val inputStream = new ReaderInputStream(new StringReader(infosetString), "UTF-8")
 
     val saxInput = new InputSource(inputStream)
@@ -459,11 +470,10 @@ final class IBMTDMLDFDLProcessor private (
        *
        * E.g., U+E000 must become NUL (aka code point zero)
        */
-      private val remapper = XMLUtils.remapPUAToXMLIllegalChar _
-
       override def characters(ch: Array[Char], start: Int, length: Int): Unit = {
-        val withoutPUAsArray = ch.map { remapper(_) }
-        super.characters(withoutPUAsArray, start, length)
+        val origString = new String(ch, start, length)
+        val withoutPUAsArray = XMLUtils.remapPUAToXMLIllegalCharacters(origString)
+        super.characters(withoutPUAsArray.toCharArray, 0, withoutPUAsArray.length)
       }
     }
 
@@ -513,8 +523,6 @@ final class IBMTDMLParseResult(diags: Seq[IBMTDMLDiagnostic], dfdlReader: DFDLRe
 }
 
 final class IBMTDMLDataLocation(myReader: DFDLReader) extends DataLocation {
-  override def isAtEnd = true // shuts off left-over data checks for parsing
-
   override def bitPos1b: Long = -1 // shuts off precise length/position checking for unparsing
 
   override def bytePos1b: Long = -1

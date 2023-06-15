@@ -17,8 +17,8 @@
   </tdml:parserTestCase>
 
   <tdml:defineSchema name="s">
-    <xs:include schemaLocation="org/apache/daffodil/xsd/DFDLGeneralFormat.dfdl.xsd" />
-    <dfdl:format ref="ex:GeneralFormat" encodingErrorPolicy="error"/>
+    <xs:include schemaLocation="org/apache/daffodil/xsd/DFDLGeneralFormatPortable.dfdl.xsd" />
+    <dfdl:format ref="ex:GeneralFormat" />
     <xs:element name="r" ibmDfdlExtn:docRoot="true" type="xs:string" dfdl:lengthKind="delimited" />
   </tdml:defineSchema>
 
@@ -60,8 +60,8 @@
  </tdml:parserTestCase>
 
  <tdml:defineSchema name="twoPass">
-   <xs:include schemaLocation="org/apache/daffodil/xsd/DFDLGeneralFormat.dfdl.xsd" />
-   <dfdl:format ref="ex:GeneralFormat" encodingErrorPolicy="error" />
+   <xs:include schemaLocation="org/apache/daffodil/xsd/DFDLGeneralFormatPortable.dfdl.xsd" />
+   <dfdl:format ref="ex:GeneralFormat" />
    <xs:element name="r" dfdl:lengthKind="implicit">
      <xs:complexType>
        <xs:sequence dfdl:separator="; ,">
