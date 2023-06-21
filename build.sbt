@@ -4,7 +4,7 @@ organization := "io.github.openDFDL"
  
 version := "1.0.0-SNAPSHOT"
 
-scalaVersion := "2.12.11"
+scalaVersion := "2.12.18"
  
 parallelExecution in Test := false
 
