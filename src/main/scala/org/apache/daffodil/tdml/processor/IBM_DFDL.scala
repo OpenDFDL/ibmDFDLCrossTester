@@ -455,7 +455,10 @@ final class IBMTDMLDFDLProcessor private (
     serializer.setErrorHandler(errorHandler)
 
     val infosetString = RemoveDafintTransformer(infosetXML).toString()
-    val inputStream = new ReaderInputStream(new StringReader(infosetString), "UTF-8")
+    val inputStream = ReaderInputStream.builder()
+      .setReader(new StringReader(infosetString))
+      .setCharset("UTF-8")
+      .get()
 
     val saxInput = new InputSource(inputStream)
 
