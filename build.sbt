@@ -4,8 +4,6 @@ organization := "io.github.openDFDL"
  
 version := "1.0.0-SNAPSHOT"
 
-scalaVersion := "2.12.18"
- 
 Test / parallelExecution := false
 
 libraryDependencies ++= Seq(
