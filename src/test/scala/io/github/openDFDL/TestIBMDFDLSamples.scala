@@ -30,8 +30,8 @@ object TestIBMDFDLSamples {
 class TestIBMDFDLSamples {
   import TestIBMDFDLSamples._
 
-  @Test def test_company1() { runner.runOneTest("company1") }
+  @Test def test_company1() = { runner.runOneTest("company1") }
 
-  @Test def test_company1SelfContained() { runnerSC.runOneTest("company1") }
+  @Test def test_company1SelfContained() = { runnerSC.runOneTest("company1") }
 
 }

@@ -27,16 +27,16 @@ object TestCrossTestRig {
 class TestCrossTestRig {
   import TestCrossTestRig._
 
-  @Test def testIBMTDML1() { runner.runOneTest("test1") }
+  @Test def testIBMTDML1() = { runner.runOneTest("test1") }
 
-  @Test def testIBMTDML2() { runner.runOneTest("test2") }
+  @Test def testIBMTDML2() = { runner.runOneTest("test2") }
 
-  @Test def testIBMTDMLNeg1() { runner.runOneTest("test1Neg") }
+  @Test def testIBMTDMLNeg1() = { runner.runOneTest("test1Neg") }
 
-  @Test def testIBMTDML_utest1() { runner.runOneTest("utest1") }
+  @Test def testIBMTDML_utest1() = { runner.runOneTest("utest1") }
 
-  @Test def testIBMTDML_twoPass() { runner.runOneTest("testTwoPass") }
+  @Test def testIBMTDML_twoPass() = { runner.runOneTest("testTwoPass") }
 
-  @Test def testIBMTDML_ptest1_neg() { runner.runOneTest("ptest1-neg") }
+  @Test def testIBMTDML_ptest1_neg() = { runner.runOneTest("ptest1-neg") }
 
 }

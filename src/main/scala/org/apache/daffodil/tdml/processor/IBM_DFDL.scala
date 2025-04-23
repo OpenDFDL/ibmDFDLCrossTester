@@ -271,7 +271,7 @@ sealed trait DiagnosticsMixin {
      * If the message mentions DFDL features clearly unsupported by IBM DFDL,
      * then the test is skipped.
      */
-    private def shortcutError(msg: String) {
+    private def shortcutError(msg: String) = {
       val hasIVC = msg.contains("inputValueCalc")
       lazy val hasOVC = msg.contains("outputValueCalc")
       lazy val hasHGR = msg.contains("hiddenGroupRef")
