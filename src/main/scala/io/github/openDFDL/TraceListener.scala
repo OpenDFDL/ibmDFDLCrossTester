@@ -14,6 +14,6 @@ class TraceListener extends IDFDLUserTraceListener with IDFDLServiceTraceListene
   def fatal(traceItem: IDFDLTrace): Unit = msg("fatal", traceItem)
   def detail(traceItem: IDFDLTrace): Unit = msg("detail", traceItem)
 
-  def entry(traceItem: IDFDLTrace) {}
-  def exit(traceItem: IDFDLTrace) {}
+  def entry(traceItem: IDFDLTrace) = {}
+  def exit(traceItem: IDFDLTrace) = {}
 }
