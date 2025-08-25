@@ -20,18 +20,19 @@ package org.apache.daffodil.processor.tdml
 import java.io.StringReader
 import java.net.URI
 
+import scala.jdk.CollectionConverters.*
 import scala.xml.Node
 import scala.xml.Elem
 import scala.xml.transform.RuleTransformer
 import scala.xml.transform.RewriteRule
 
 import org.apache.commons.io.input.ReaderInputStream
-import org.apache.daffodil.lib.api.DaffodilSchemaSource
-import org.apache.daffodil.lib.api.DataLocation
-import org.apache.daffodil.lib.api.Diagnostic
-import org.apache.daffodil.lib.api.EmbeddedSchemaSource
-import org.apache.daffodil.lib.api.URISchemaSource
-import org.apache.daffodil.lib.api.ValidationMode
+import org.apache.daffodil.api
+import org.apache.daffodil.api.DataLocation
+import org.apache.daffodil.lib.iapi
+import org.apache.daffodil.lib.iapi.DaffodilSchemaSource
+import org.apache.daffodil.lib.iapi.EmbeddedSchemaSource
+import org.apache.daffodil.lib.iapi.URISchemaSource
 import org.apache.daffodil.lib.exceptions.Assert
 import org.apache.daffodil.lib.externalvars.Binding
 import org.apache.daffodil.lib.util.Maybe
@@ -83,7 +84,7 @@ final class IDFDLDiagFromThrowable(cause: Throwable) extends IDFDLDiagnostic {
 }
 
 final class IBMTDMLDiagnostic(iddArg: IDFDLDiagnostic, throwable: Throwable, mode: IBMDFDLMode.Type)
-  extends Diagnostic(Maybe.Nope, Maybe.Nope,
+  extends iapi.Diagnostic(Maybe.Nope, Maybe.Nope,
     maybeCause = Maybe(throwable),
     maybeFormatString = Maybe(if (iddArg ne null) iddArg.getSummary() else null)) {
 
@@ -184,7 +185,7 @@ final class TDMLDFDLProcessorFactory private (
   private def toss(e: Throwable) = {
     val exc = e
     System.err.println("DFDL exception creating grammar: " + exc.getMessage)
-    System.err.println(diagnostics.map(_.getSomeMessage.get).mkString("\n"))
+    System.err.println(diagnostics.map(_.toString).mkString("\n"))
     throw exc
   }
 
@@ -192,7 +193,6 @@ final class TDMLDFDLProcessorFactory private (
 
   override def getProcessor(
     schemaSource: DaffodilSchemaSource,
-    useSerializedProcessor: Boolean,
     optRootName: Option[String],
     optRootNamespace: Option[String],
     tunables: Map[String, String]): TDML.CompileResult = {
@@ -237,9 +237,9 @@ final class TDMLDFDLProcessorFactory private (
         }
       }
     if (grammar == null || getDiagnostics.exists(_.isError)) {
-      Left(getDiagnostics)
+      Left(getDiagnostics.asJava)
     } else {
-      Right((getDiagnostics, new IBMTDMLDFDLProcessor(diagnostics, grammar, bindings, optRootName, rootNamespace)))
+      Right((getDiagnostics.asJava, new IBMTDMLDFDLProcessor(diagnostics, grammar, bindings, optRootName, rootNamespace)))
     }
   }
 
@@ -252,7 +252,7 @@ sealed trait DiagnosticsMixin {
 
   def isError: Boolean = diagnostics.exists { _.isError }
 
-  def getDiagnostics: Seq[Diagnostic] = diagnostics
+  def getDiagnostics: Seq[api.Diagnostic] = diagnostics
 
   protected var diagnostics: Seq[IBMTDMLDiagnostic] = Seq()
 
@@ -360,10 +360,6 @@ final class IBMTDMLDFDLProcessor private (
       shouldValidate = shouldValidate)
 
   override def withDebugger(db: Object): IBMTDMLDFDLProcessor = ???
-  override def withDebugging(onOff: Boolean): IBMTDMLDFDLProcessor = {
-    if (onOff) ???
-    this
-  }
 
   override def withExternalDFDLVariables(externalVarBindings: Seq[Binding]): IBMTDMLDFDLProcessor =
     copy(bindings = externalVarBindings)
@@ -371,11 +367,11 @@ final class IBMTDMLDFDLProcessor private (
   override def withTracing(onOff: Boolean): IBMTDMLDFDLProcessor =
     copy(isTraceMode = onOff)
 
-  override def withValidationMode(validationMode: ValidationMode.Type): IBMTDMLDFDLProcessor =
+  override def withValidation(validationMode: String): IBMTDMLDFDLProcessor =
     copy(shouldValidate = validationMode match {
-      case ValidationMode.Full => true
-      case ValidationMode.Limited => true
-      case ValidationMode.Off => false
+      case "xerces" => true
+      case "daffodil" => true
+      case "off" => false
       case _ => Assert.usageError("validation mode " + validationMode + " is unsupported.")
     })
 
@@ -510,9 +506,9 @@ sealed class IBMTDMLResult(diags: Seq[IBMTDMLDiagnostic]) {
 
   def isValidationError: Boolean = diagnostics.exists { _.getType() == DFDLDiagnosticType.VALIDATIONERROR }
 
-  def getDiagnostics: Seq[Diagnostic] = diagnostics
+  def getDiagnostics: java.util.List[api.Diagnostic] = diagnostics.asJava
 
-  def addDiagnostic(diag: Diagnostic): Unit = { diagnostics = diag.asInstanceOf[IBMTDMLDiagnostic] +: diagnostics }
+  def addDiagnostic(diag: iapi.Diagnostic): Unit = { diagnostics = diag.asInstanceOf[IBMTDMLDiagnostic] +: diagnostics }
 
 }
 
