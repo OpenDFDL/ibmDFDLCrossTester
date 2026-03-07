@@ -58,8 +58,9 @@ A setup script is included that copies all required jars and sample files
 automatically. Run it from the project root:
 
 ```powershell
-.\setup-ace-jars.ps1              # defaults to ACE 12
-.\setup-ace-jars.ps1 -AceVersion 13
+.\setup-ace-jars.ps1                                  # defaults to ACE 12 default path
+.\setup-ace-jars.ps1 -AceVersion 13                   # ACE 13 default path
+.\setup-ace-jars.ps1 -AcePath "D:\IBM\ACE\12.0.12.17" # custom install location
 ```
 
 ### Manual setup

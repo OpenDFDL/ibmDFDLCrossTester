@@ -4,30 +4,46 @@
 
 .PARAMETER AceVersion
     The ACE major version to use. Supported values: "12" (default), "13".
+    Ignored when -AcePath is supplied.
+
+.PARAMETER AcePath
+    Full path to the ACE installation root (e.g. "D:\IBM\ACE\12.0.12.17").
+    When supplied, -AceVersion is ignored and no version label is required.
 
 .EXAMPLE
     .\setup-ace-jars.ps1
     .\setup-ace-jars.ps1 -AceVersion 13
+    .\setup-ace-jars.ps1 -AcePath "D:\IBM\ACE\12.0.12.17"
 #>
 param(
-    [string]$AceVersion = "12"
+    [string]$AceVersion = "12",
+    [string]$AcePath    = ""
 )
 
-$acePaths = @{
-    "12" = "C:\Program Files\IBM\ACE\12.0.12.17"
-    "13" = "C:\Program Files\IBM\ACE\13.0.6.0"
-}
-
-if (-not $acePaths.ContainsKey($AceVersion)) {
-    Write-Error "Unsupported AceVersion '$AceVersion'. Supported: $($acePaths.Keys -join ', ')"
-    exit 1
-}
-
-$aceRoot   = $acePaths[$AceVersion]
 $scriptDir = $PSScriptRoot
 
+if ($AcePath -ne "") {
+    # Custom path supplied — use it directly
+    $aceRoot  = $AcePath
+    $aceLabel = $AcePath
+} else {
+    # Look up path from version string
+    $acePaths = @{
+        "12" = "C:\Program Files\IBM\ACE\12.0.12.17"
+        "13" = "C:\Program Files\IBM\ACE\13.0.6.0"
+    }
+
+    if (-not $acePaths.ContainsKey($AceVersion)) {
+        Write-Error "Unsupported AceVersion '$AceVersion'. Supported: $($acePaths.Keys -join ', '). Use -AcePath to supply a custom path."
+        exit 1
+    }
+
+    $aceRoot  = $acePaths[$AceVersion]
+    $aceLabel = "ACE $AceVersion"
+}
+
 if (-not (Test-Path $aceRoot)) {
-    Write-Error "ACE $AceVersion install not found at: $aceRoot"
+    Write-Error "ACE install not found at: $aceRoot"
     exit 1
 }
 
@@ -56,7 +72,7 @@ function Copy-File($src, $dst) {
 }
 
 Write-Host ""
-Write-Host "=== IBM DFDL Cross-Tester Setup (ACE $AceVersion) ===" -ForegroundColor Cyan
+Write-Host "=== IBM DFDL Cross-Tester Setup ($aceLabel) ===" -ForegroundColor Cyan
 Write-Host "ACE root : $aceRoot"
 Write-Host ""
 
