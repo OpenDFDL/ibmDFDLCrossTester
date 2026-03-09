@@ -39,8 +39,8 @@ Point `validate.ps1` at your schema and data file:
 
 ```powershell
 .\validate.ps1 `
-    -Schema "D:\GIT\ibmDFDLCrossTester\test\ROCS\ROCS_Inhouse.xsd" `
-    -Data   "D:\GIT\ibmDFDLCrossTester\test\ROCS\0001144785.txt"
+    -Schema "C:\path\to\MySchema.xsd" `
+    -Data   "C:\path\to\mydata.txt"
 ```
 
 ### What it does
@@ -58,15 +58,15 @@ Point `validate.ps1` at your schema and data file:
 ### Success output
 
 ```
-Schema    : D:\...\ROCS_Inhouse.xsd
-Data file : D:\...\0001144785.txt
-Root      : Inhouse_Dis  namespace: (none)
+Schema    : C:\path\to\MySchema.xsd
+Data file : C:\path\to\mydata.txt
+Root      : MyRootElement  namespace: (none)
 
 === PARSE SUCCESSFUL ===
-<Inhouse_Dis>
-    <SENDER-ID-ROCS>NTSPCLDN        </SENDER-ID-ROCS>
+<MyRootElement>
+    <Field1>value1</Field1>
     ...
-</Inhouse_Dis>
+</MyRootElement>
 ```
 
 ### Failure output
@@ -91,7 +91,7 @@ Examples:
 
 ```powershell
 # Schema has two doc-root elements — pick one explicitly
-.\validate.ps1 -Schema "..." -Data "..." -Root "Inhouse_Load"
+.\validate.ps1 -Schema "..." -Data "..." -Root "MyRootElement"
 
 # ACE 13
 .\validate.ps1 -Schema "..." -Data "..." -AceVersion 13
@@ -110,12 +110,12 @@ summary. Each line shows the event level, the error code (if any), the byte
 offset, and the schema location:
 
 ```
-TraceListener: error: CTDP3041E: Initiator '2210' not found at offset '1.724' for element '...EITG2210[1]'.
-TraceListener: info: Offset: 1724. Parser was unable to resolve data on the current branch ...
-TraceListener: info: Offset: 1724. Element 'INHOUSE-CNI-ROCS' is optional or missing. The element will not be included in the infoset.
-TraceListener: fatal: CTDP3002E: Unexpected data found at offset '1724' after parsing completed.
+TraceListener: error: CTDP3041E: Initiator 'ABC' not found at offset '42' for element '.../MyElement[1]'.
+TraceListener: info: Offset: 42. Parser was unable to resolve data on the current branch ...
+TraceListener: info: Offset: 42. Element 'OptionalChild' is optional or missing. The element will not be included in the infoset.
+TraceListener: fatal: CTDP3002E: Unexpected data found at offset '42' after parsing completed.
 === PARSE FAILED ===
-[Fatal error] CTDP3002E: Unexpected data found at offset '1724' after parsing completed.
+[Fatal error] CTDP3002E: Unexpected data found at offset '42' after parsing completed.
 ```
 
 The `error:` lines identify which schema element failed to match and why —
