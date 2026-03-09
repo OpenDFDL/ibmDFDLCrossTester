@@ -60,7 +60,7 @@ automatically. Run it from the project root:
 ```powershell
 .\setup-ace-jars.ps1                                  # defaults to ACE 12 default path
 .\setup-ace-jars.ps1 -AceVersion 13                   # ACE 13 default path
-.\setup-ace-jars.ps1 -AcePath "D:\IBM\ACE\12.0.12.17" # custom install location
+.\setup-ace-jars.ps1 -AcePath "C:\Program Files\IBM\ACE\12.0.12.17" # custom install location
 ```
 
 ### Manual setup
@@ -131,6 +131,33 @@ src/test/resources/
 └── IBMdefined
     └── RecordSeparatedFieldFormat.xsd (copy from IBM DFDL)
 ```
+
+## Ad-hoc Validation (validate.ps1)
+
+If you just want to parse a data file against a DFDL schema without writing
+TDML test files, use the included `validate.ps1` script:
+
+```powershell
+.\validate.ps1 -Schema "path\to\MySchema.xsd" -Data "path\to\mydata.txt"
+```
+
+The script auto-detects the root element from the schema and prints the parsed
+XML infoset on success, or a clear error message on failure. Exit code is 0
+on success and non-zero on failure (usable in CI).
+
+```powershell
+# Explicit root element (when schema has multiple doc-root candidates)
+.\validate.ps1 -Schema "..." -Data "..." -Root "MyRootElement"
+
+# Custom ACE install path
+.\validate.ps1 -Schema "..." -Data "..." -AcePath "C:\Program Files\IBM\ACE\12.0.12.17"
+```
+
+> The script automatically copies `IBMdefined/RecordSeparatedFieldFormat.xsd`
+> next to your schema if the schema imports it via a relative path. Run
+> `setup-ace-jars.ps1` first to populate that folder.
+
+See [HOW-TO-TEST.md](HOW-TO-TEST.md) for a step-by-step walkthrough.
 
 ## Build & Test
 
