@@ -7,13 +7,13 @@
     Ignored when -AcePath is supplied.
 
 .PARAMETER AcePath
-    Full path to the ACE installation root (e.g. "D:\IBM\ACE\12.0.12.17").
+    Full path to the ACE installation root (e.g. "C:\Program Files\IBM\ACE\12.0.12.17").
     When supplied, -AceVersion is ignored and no version label is required.
 
 .EXAMPLE
     .\setup-ace-jars.ps1
     .\setup-ace-jars.ps1 -AceVersion 13
-    .\setup-ace-jars.ps1 -AcePath "D:\IBM\ACE\12.0.12.17"
+    .\setup-ace-jars.ps1 -AcePath "C:\Program Files\IBM\ACE\12.0.12.17"
 #>
 param(
     [string]$AceVersion = "12",
