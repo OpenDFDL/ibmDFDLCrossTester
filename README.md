@@ -151,7 +151,13 @@ on success and non-zero on failure (usable in CI).
 
 # Custom ACE install path
 .\validate.ps1 -Schema "..." -Data "..." -AcePath "C:\Program Files\IBM\ACE\12.0.12.17"
+
+# Custom sbt location (if not installed at the default path)
+.\validate.ps1 -Schema "..." -Data "..." -SbtPath "D:\tools\sbt\bin\sbt.bat"
 ```
+
+> sbt defaults to `C:\Program Files (x86)\sbt\bin\sbt.bat`. If sbt is installed
+> elsewhere, pass `-SbtPath` with the full path to `sbt.bat`.
 
 > The script automatically copies `IBMdefined/RecordSeparatedFieldFormat.xsd`
 > next to your schema if the schema imports it via a relative path. Run

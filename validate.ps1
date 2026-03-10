@@ -23,12 +23,16 @@
     stderr, including schema path and byte offset for each parse decision. Useful for
     diagnosing parse failures.
 
+.PARAMETER SbtPath
+    Full path to sbt.bat. Defaults to "C:\Program Files (x86)\sbt\bin\sbt.bat".
+
 .EXAMPLE
-    .\validate.ps1 -Schema "D:\GIT\...\ROCS_Inhouse.xsd" -Data "D:\GIT\...\0001144785.txt"
-    .\validate.ps1 -Schema "..." -Data "..." -Root "Inhouse_Dis"
+    .\validate.ps1 -Schema "C:\path\to\MySchema.xsd" -Data "C:\path\to\mydata.txt"
+    .\validate.ps1 -Schema "..." -Data "..." -Root "MyRootElement"
     .\validate.ps1 -Schema "..." -Data "..." -AceVersion 13
     .\validate.ps1 -Schema "..." -Data "..." -AcePath "C:\Program Files\IBM\ACE\12.0.12.17"
     .\validate.ps1 -Schema "..." -Data "..." -Trace
+    .\validate.ps1 -Schema "..." -Data "..." -SbtPath "D:\tools\sbt\bin\sbt.bat"
 #>
 param(
     [Parameter(Mandatory=$true)]  [string]$Schema,
@@ -36,6 +40,7 @@ param(
     [string]$Root       = "",
     [string]$AceVersion = "12",
     [string]$AcePath    = "",
+    [string]$SbtPath    = "C:\Program Files (x86)\sbt\bin\sbt.bat",
     [switch]$Trace
 )
 
@@ -116,6 +121,9 @@ Write-Host "Data   : $Data"
 if ($Root -ne "") { Write-Host "Root   : $Root" }
 Write-Host ""
 
-$sbt = "C:\Program Files (x86)\sbt\bin\sbt.bat"
-& $sbt @sbtArgs
+if (-not (Test-Path $SbtPath)) {
+    Write-Error "sbt not found at: $SbtPath. Use -SbtPath to specify the correct location."
+    exit 1
+}
+& $SbtPath @sbtArgs
 exit $LASTEXITCODE

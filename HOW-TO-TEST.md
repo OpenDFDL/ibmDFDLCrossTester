@@ -85,6 +85,7 @@ Root      : MyRootElement  namespace: (none)
 | `-Root <name>` | auto-detect | Force a specific root element name |
 | `-AceVersion 12\|13` | `12` | Select ACE version by number |
 | `-AcePath <path>` | — | Full path to ACE install root (overrides `-AceVersion`) |
+| `-SbtPath <path>` | `C:\Program Files (x86)\sbt\bin\sbt.bat` | Full path to `sbt.bat` |
 | `-Trace` | off | Print IBM DFDL's full service trace to stderr (note: `-Verbose` is reserved by PowerShell) |
 
 Examples:
@@ -96,8 +97,11 @@ Examples:
 # ACE 13
 .\validate.ps1 -Schema "..." -Data "..." -AceVersion 13
 
-# Non-standard install location
+# Non-standard ACE install location
 .\validate.ps1 -Schema "..." -Data "..." -AcePath "C:\Program Files\IBM\ACE\12.0.12.17"
+
+# sbt installed in a non-standard location
+.\validate.ps1 -Schema "..." -Data "..." -SbtPath "D:\tools\sbt\bin\sbt.bat"
 
 # Detailed trace output for diagnosing parse failures
 .\validate.ps1 -Schema "..." -Data "..." -Trace
