@@ -13,6 +13,10 @@ portable DFDL schemas.
 
 Similar cross testers can be created for other DFDL implementations as well.
 
+## Community
+
+Questions or feedback? Join the discussion on [Discord](https://discord.gg/58JXXk4uDG).
+
 ## Requirements
 
 * IBM DFDL - included in IBM App Connect Enterprise (ACE). A developer edition is available.
