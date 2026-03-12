@@ -1,11 +1,12 @@
 package io.github.openDFDL
 
 import com.ibm.dfdl.sample.sax.reader.XMLSAXContentHandler
+import org.xml.sax.Attributes
+import org.xml.sax.SAXException
+
 import java.net.URI
 import java.util.Stack
-import org.xml.sax.Attributes
 import javax.xml.XMLConstants
-import org.xml.sax.SAXException
 
 /**
  * Use a namespace stack, to fix broken namespace prefix handling

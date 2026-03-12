@@ -25,7 +25,7 @@ object TestCrossTestRig {
 }
 
 class TestCrossTestRig {
-  import TestCrossTestRig._
+  import TestCrossTestRig.*
 
   @Test def testIBMTDML1() = { runner.runOneTest("test1") }
 
