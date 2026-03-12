@@ -15,35 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.daffodil.processor.tdml
-
-import java.io.StringReader
-import java.net.URI
-
-import scala.jdk.CollectionConverters.*
-import scala.xml.Node
-import scala.xml.Elem
-import scala.xml.transform.RuleTransformer
-import scala.xml.transform.RewriteRule
-
-import org.apache.commons.io.input.ReaderInputStream
-import org.apache.daffodil.api
-import org.apache.daffodil.api.DataLocation
-import org.apache.daffodil.lib.iapi
-import org.apache.daffodil.lib.iapi.DaffodilSchemaSource
-import org.apache.daffodil.lib.iapi.EmbeddedSchemaSource
-import org.apache.daffodil.lib.iapi.URISchemaSource
-import org.apache.daffodil.lib.exceptions.Assert
-import org.apache.daffodil.lib.externalvars.Binding
-import org.apache.daffodil.lib.util.Maybe
-import org.apache.daffodil.lib.xml.DFDLCatalogResolver
-import org.apache.daffodil.lib.xml.XMLUtils
-import org.apache.daffodil.tdml.processor._
-
-import org.xml.sax.ErrorHandler
-import org.xml.sax.InputSource
-import org.xml.sax.SAXParseException
-import org.xml.sax.helpers.XMLReaderFactory
+package org.apache.daffodil.tdml.processor
 
 import com.ibm.dfdl.grammar.DFDLGrammarFactory
 import com.ibm.dfdl.grammar.IDFDLGrammar
@@ -54,15 +26,38 @@ import com.ibm.dfdl.processor.IDFDLProcessor
 import com.ibm.dfdl.processor.IDFDLProcessorErrorHandler
 import com.ibm.dfdl.processor.exceptions.DFDLException
 import com.ibm.dfdl.processor.types.DFDLDiagnosticType
-
 import com.ibm.dfdl.sample.sax.reader.DFDLReader
 import com.ibm.dfdl.sample.sax.writer.SAXToDFDLEventAdapter
-
-import io.github.openDFDL.TraceListener
 import io.github.openDFDL.DFDLReader2
+import io.github.openDFDL.TraceListener
 import io.github.openDFDL.XMLSAXContentHandler1
-
+import org.apache.commons.io.input.ReaderInputStream
+import org.apache.daffodil.api
+import org.apache.daffodil.api.DataLocation
+import org.apache.daffodil.lib.exceptions.Assert
+import org.apache.daffodil.lib.externalvars.Binding
+import org.apache.daffodil.lib.iapi
+import org.apache.daffodil.lib.iapi.DaffodilSchemaSource
+import org.apache.daffodil.lib.iapi.EmbeddedSchemaSource
+import org.apache.daffodil.lib.iapi.URISchemaSource
+import org.apache.daffodil.lib.util.Maybe
+import org.apache.daffodil.lib.xml.DFDLCatalogResolver
+import org.apache.daffodil.lib.xml.XMLUtils
+import org.apache.daffodil.processor.tdml._
 import org.apache.daffodil.tdml.TDMLTestNotCompatibleException
+import org.apache.daffodil.tdml.processor.*
+import org.xml.sax.ErrorHandler
+import org.xml.sax.InputSource
+import org.xml.sax.SAXParseException
+import org.xml.sax.helpers.XMLReaderFactory
+
+import java.io.StringReader
+import java.net.URI
+import scala.jdk.CollectionConverters.*
+import scala.xml.Elem
+import scala.xml.Node
+import scala.xml.transform.RewriteRule
+import scala.xml.transform.RuleTransformer
 
 object IBMDFDLMode extends Enumeration {
   type Type = Value
@@ -369,8 +364,8 @@ final class IBMTDMLDFDLProcessor private (
 
   override def withValidation(validationMode: String): IBMTDMLDFDLProcessor =
     copy(shouldValidate = validationMode match {
-      case "xerces" => true
-      case "daffodil" => true
+      case "on" => true
+      case "limited" => true
       case "off" => false
       case _ => Assert.usageError("validation mode " + validationMode + " is unsupported.")
     })

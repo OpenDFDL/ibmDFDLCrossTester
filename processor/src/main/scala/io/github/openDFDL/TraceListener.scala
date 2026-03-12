@@ -1,7 +1,7 @@
 package io.github.openDFDL
+import com.ibm.dfdl.processor.trace.IDFDLServiceTraceListener
 import com.ibm.dfdl.processor.trace.IDFDLTrace
 import com.ibm.dfdl.processor.trace.IDFDLUserTraceListener
-import com.ibm.dfdl.processor.trace.IDFDLServiceTraceListener
 
 class TraceListener extends IDFDLUserTraceListener with IDFDLServiceTraceListener {
 

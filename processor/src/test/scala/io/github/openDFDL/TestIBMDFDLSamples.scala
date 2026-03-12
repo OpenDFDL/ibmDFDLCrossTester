@@ -17,7 +17,8 @@
 
 package io.github.openDFDL
 
-import org.apache.daffodil.tdml.{ DFDLTestSuite, Runner }
+import org.apache.daffodil.tdml.DFDLTestSuite
+import org.apache.daffodil.tdml.Runner
 import org.junit.Test
 
 object TestIBMDFDLSamples {
@@ -28,7 +29,7 @@ object TestIBMDFDLSamples {
 }
 
 class TestIBMDFDLSamples {
-  import TestIBMDFDLSamples._
+  import TestIBMDFDLSamples.*
 
   @Test def test_company1() = { runner.runOneTest("company1") }
 
