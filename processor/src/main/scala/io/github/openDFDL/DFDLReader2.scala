@@ -1,30 +1,29 @@
 package io.github.openDFDL
 
 import com.ibm.dfdl.processor.IDFDLParser
-import org.xml.sax.ContentHandler
-import org.xml.sax.ErrorHandler
-import org.xml.sax.EntityResolver
-import org.xml.sax.DTDHandler
-import com.ibm.dfdl.processor.exceptions.DFDLNotRecognizedException
-import com.ibm.dfdl.sample.sax.reader.DFDLReader;
-import com.ibm.dfdl.sample.sax.reader.DFDLToSAXErrorAdapter;
-import com.ibm.dfdl.sample.sax.reader.DFDLToSAXEventAdapter1;
 import com.ibm.dfdl.processor.IDFDLProcessor
+import com.ibm.dfdl.processor.exceptions.DFDLException
+import com.ibm.dfdl.processor.exceptions.DFDLNotRecognizedException
+import com.ibm.dfdl.sample.sax.reader.DFDLReader
+import com.ibm.dfdl.sample.sax.reader.DFDLToSAXErrorAdapter
+import com.ibm.dfdl.sample.sax.reader.DFDLToSAXEventAdapter
+import com.ibm.dfdl.sample.sax.reader.DFDLToSAXEventAdapter1
+import org.xml.sax.ContentHandler
+import org.xml.sax.DTDHandler
+import org.xml.sax.EntityResolver
+import org.xml.sax.ErrorHandler
+import org.xml.sax.InputSource
+import org.xml.sax.SAXException
 import org.xml.sax.SAXNotRecognizedException
 import org.xml.sax.SAXNotSupportedException
-import org.xml.sax.SAXException
-import com.ibm.dfdl.processor.exceptions.DFDLException
 import org.xml.sax.SAXParseException
-import org.xml.sax.InputSource
-import com.ibm.dfdl.sample.sax.reader.DFDLToSAXEventAdapter
+import org.jdom2.JDOMConstants._
 
 /**
  * We re-implement this class all so that it can construct a
  * documentHandler that has the bug fix in it.
  */
 class DFDLReader2(val parser: IDFDLParser) extends DFDLReader(parser) {
-
-  import DFDLReader._
 
   private var saxContentHandler: ContentHandler = null
   private var saxErrorHandler: ErrorHandler = null
