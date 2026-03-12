@@ -19,19 +19,21 @@ package org.apache.daffodil.processor.tdml
 
 import java.io.StringReader
 import java.net.URI
+import java.util.{List => JList}
 
+import scala.jdk.CollectionConverters._
 import scala.xml.Node
 import scala.xml.Elem
 import scala.xml.transform.RuleTransformer
 import scala.xml.transform.RewriteRule
 
 import org.apache.commons.io.input.ReaderInputStream
-import org.apache.daffodil.lib.api.DaffodilSchemaSource
-import org.apache.daffodil.lib.api.DataLocation
-import org.apache.daffodil.lib.api.Diagnostic
-import org.apache.daffodil.lib.api.EmbeddedSchemaSource
-import org.apache.daffodil.lib.api.URISchemaSource
-import org.apache.daffodil.lib.api.ValidationMode
+import org.apache.daffodil.api.{Diagnostic => ApiDiagnostic}
+import org.apache.daffodil.api.DataLocation
+import org.apache.daffodil.lib.iapi.Diagnostic
+import org.apache.daffodil.lib.iapi.DaffodilSchemaSource
+import org.apache.daffodil.lib.iapi.EmbeddedSchemaSource
+import org.apache.daffodil.lib.iapi.URISchemaSource
 import org.apache.daffodil.lib.exceptions.Assert
 import org.apache.daffodil.lib.externalvars.Binding
 import org.apache.daffodil.lib.util.Maybe
@@ -83,9 +85,12 @@ final class IDFDLDiagFromThrowable(cause: Throwable) extends IDFDLDiagnostic {
 }
 
 final class IBMTDMLDiagnostic(iddArg: IDFDLDiagnostic, throwable: Throwable, mode: IBMDFDLMode.Type)
-  extends Diagnostic(Maybe.Nope, Maybe.Nope,
-    maybeCause = Maybe(throwable),
-    maybeFormatString = Maybe(if (iddArg ne null) iddArg.getSummary() else null)) {
+  extends Diagnostic(
+    Maybe.Nope,
+    Maybe.Nope,
+    Maybe(throwable),
+    Maybe(if (iddArg ne null) iddArg.getSummary() else null),
+    Nil) {
 
   lazy val idd: IDFDLDiagnostic =
     if (iddArg ne null) iddArg
@@ -113,12 +118,13 @@ final class IBMTDMLDiagnostic(iddArg: IDFDLDiagnostic, throwable: Throwable, mod
     case DFDLDiagnosticType.WARNING | DFDLDiagnosticType.RECOVERABLEERROR => false
     case _ => true
   }
+
   /**
    * Define as "Parse", "Unparse", "Schema Definition", "Configuration".
    *
    * This is combined with the word "Error" or "Warning"
    */
-  override protected def modeName: String = idd.getType match {
+  override def modeName: String = idd.getType match {
     case DFDLDiagnosticType.PROCESSINGERROR => mode.toString()
     case DFDLDiagnosticType.SCHEMADEFINITIONERROR => "Schema Definition"
     case DFDLDiagnosticType.RECOVERABLEERROR => mode.toString()
@@ -137,9 +143,9 @@ object RemoveDafintTransformer {
   private lazy val transformer = {
     val removeDafintRule = new RewriteRule() {
       override def transform(node: Node) = node match {
-        case Elem(prefix, label, attributes, scope, children @ _ *) => {
+        case Elem(prefix, label, attributes, scope, children*) => {
           val newAttributes = attributes.filter(!_.prefixedKey.startsWith("dafint:"))
-          new Elem(prefix, label, newAttributes, scope, true, children: _*)
+          new Elem(prefix, label, newAttributes, scope, true, children*)
         }
         case other => other
       }
@@ -184,7 +190,7 @@ final class TDMLDFDLProcessorFactory private (
   private def toss(e: Throwable) = {
     val exc = e
     System.err.println("DFDL exception creating grammar: " + exc.getMessage)
-    System.err.println(diagnostics.map(_.getSomeMessage.get).mkString("\n"))
+    System.err.println(diagnostics.map(_.getMessage).mkString("\n"))
     throw exc
   }
 
@@ -192,10 +198,9 @@ final class TDMLDFDLProcessorFactory private (
 
   override def getProcessor(
     schemaSource: DaffodilSchemaSource,
-    useSerializedProcessor: Boolean,
     optRootName: Option[String],
     optRootNamespace: Option[String],
-    tunables: Map[String, String]): TDML.CompileResult = {
+    tunables: Map[String, String]): Either[JList[ApiDiagnostic], (JList[ApiDiagnostic], TDMLDFDLProcessor)] = {
 
     val rootNamespace = optRootNamespace.getOrElse(null)
 
@@ -207,12 +212,11 @@ final class TDMLDFDLProcessorFactory private (
     val schemaUri: URI = schemaSource match {
       case ess: EmbeddedSchemaSource => {
         val newNode = RemoveDafintTransformer(ess.node)
-        ess.copy(node = newNode).uriForLoading
+        ess.copy(newNode, ess.nameHint, ess.optTmpDir).uriForLoading
       }
       case ss => schemaSource.uriForLoading
     }
 
-    Assert.invariant(schemaSource.isInstanceOf[URISchemaSource])
     val grammar =
       try {
         //
@@ -236,7 +240,7 @@ final class TDMLDFDLProcessorFactory private (
           toss(e)
         }
       }
-    if (grammar == null || getDiagnostics.exists(_.isError)) {
+    if (grammar == null || diagnostics.exists(_.isError)) {
       Left(getDiagnostics)
     } else {
       Right((getDiagnostics, new IBMTDMLDFDLProcessor(diagnostics, grammar, bindings, optRootName, rootNamespace)))
@@ -252,7 +256,7 @@ sealed trait DiagnosticsMixin {
 
   def isError: Boolean = diagnostics.exists { _.isError }
 
-  def getDiagnostics: Seq[Diagnostic] = diagnostics
+  def getDiagnostics: JList[ApiDiagnostic] = (diagnostics: Seq[ApiDiagnostic]).asJava
 
   protected var diagnostics: Seq[IBMTDMLDiagnostic] = Seq()
 
@@ -360,10 +364,6 @@ final class IBMTDMLDFDLProcessor private (
       shouldValidate = shouldValidate)
 
   override def withDebugger(db: Object): IBMTDMLDFDLProcessor = ???
-  override def withDebugging(onOff: Boolean): IBMTDMLDFDLProcessor = {
-    if (onOff) ???
-    this
-  }
 
   override def withExternalDFDLVariables(externalVarBindings: Seq[Binding]): IBMTDMLDFDLProcessor =
     copy(bindings = externalVarBindings)
@@ -371,11 +371,11 @@ final class IBMTDMLDFDLProcessor private (
   override def withTracing(onOff: Boolean): IBMTDMLDFDLProcessor =
     copy(isTraceMode = onOff)
 
-  override def withValidationMode(validationMode: ValidationMode.Type): IBMTDMLDFDLProcessor =
+  override def withValidation(validationMode: String): IBMTDMLDFDLProcessor =
     copy(shouldValidate = validationMode match {
-      case ValidationMode.Full => true
-      case ValidationMode.Limited => true
-      case ValidationMode.Off => false
+      case "full" => true
+      case "limited" => true
+      case "off" => false
       case _ => Assert.usageError("validation mode " + validationMode + " is unsupported.")
     })
 
@@ -510,7 +510,7 @@ sealed class IBMTDMLResult(diags: Seq[IBMTDMLDiagnostic]) {
 
   def isValidationError: Boolean = diagnostics.exists { _.getType() == DFDLDiagnosticType.VALIDATIONERROR }
 
-  def getDiagnostics: Seq[Diagnostic] = diagnostics
+  def getDiagnostics: JList[ApiDiagnostic] = (diagnostics: Seq[ApiDiagnostic]).asJava
 
   def addDiagnostic(diag: Diagnostic): Unit = { diagnostics = diag.asInstanceOf[IBMTDMLDiagnostic] +: diagnostics }
 

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"/c/Program Files/IBM/ACE/12.0.12.17/common/java17/bin/jar.exe\" tf \"C:/Users/Bmatt/AppData/Local/Coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/daffodil/daffodil-tdml-lib_3/4.1.0/daffodil-tdml-lib_3-4.1.0.jar\")",
+      "Bash(grep -v \"$\")",
+      "Bash(grep \"\\\\.class$\")",
+      "Bash(\"/c/Program Files/IBM/ACE/12.0.12.17/common/java17/bin/javap.exe\" -classpath \"C:/Users/Bmatt/AppData/Local/Coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/daffodil/daffodil-tdml-lib_3/4.1.0/daffodil-tdml-lib_3-4.1.0.jar\" \"org.apache.daffodil.tdml.processor.AbstractTDMLDFDLProcessorFactory\")",
+      "Bash(\"/c/Program Files/IBM/ACE/12.0.12.17/common/java17/bin/javap.exe\" -classpath \"C:/Users/Bmatt/AppData/Local/Coursier/cache/v1/https/repo1.maven.org/maven2/org/apache/daffodil/daffodil-tdml-lib_3/4.1.0/daffodil-tdml-lib_3-4.1.0.jar\" \"org.apache.daffodil.tdml.processor.TDMLDFDLProcessor\")",
+      "WebFetch(domain:matthiasblomme.github.io)"
+    ]
+  }
+}

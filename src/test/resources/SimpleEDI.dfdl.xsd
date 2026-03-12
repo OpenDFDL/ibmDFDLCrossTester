@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SimpleEDI.dfdl.xsd
+
+  A simplified EDI-inspired DFDL schema for testing the IBM DFDL Cross-Tester.
+
+  Message format:
+    HDR+<Sender>+<Receiver>+<Date>+<MessageType>'
+    DTL+<LineNum>+<ItemCode>+<Quantity>+<Unit>'
+    ... (0..99 DTL segments)
+    TRL+<ControlCount>'
+
+  Delimiters:
+    Field separator : +
+    Segment terminator : ' (apostrophe), optionally followed by whitespace/newlines
+-->
+<xs:schema
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:dfdl="http://www.ogf.org/dfdl/dfdl-1.0/"
+    xmlns:ibmDfdlExtn="http://www.ibm.com/dfdl/extensions"
+    xmlns:edi="http://example.com/simpleedi"
+    targetNamespace="http://example.com/simpleedi">
+
+  <xs:include schemaLocation="org/apache/daffodil/xsd/DFDLGeneralFormatPortable.dfdl.xsd"/>
+
+  <xs:annotation>
+    <xs:appinfo source="http://www.ogf.org/dfdl/">
+      <!--
+        Base format: text, delimited by '+' as field separator.
+        Each segment is terminated by "'" optionally followed by whitespace/newlines.
+        The segment tag is parsed as the dfdl:initiator on each segment element.
+      -->
+      <dfdl:format
+          ref="edi:GeneralFormat"
+          encoding="ASCII"
+          representation="text"
+          lengthKind="delimited"
+          separator="+"
+          separatorPosition="infix"
+          separatorPolicy="required"
+          initiator=""
+          terminator=""
+          textTrimKind="none"
+          ignoreCase="no"
+          occursCountKind="implicit"
+          sequenceKind="ordered"
+          choiceLengthKind="implicit"
+          initiatedContent="no"
+          documentFinalTerminatorCanBeMissing="yes"
+          emptyValueDelimiterPolicy="none"
+          textStringJustification="left"
+          textNumberJustification="right"
+          textNumberCheckPolicy="lax"
+          fillByte="%SP;"
+          leadingSkip="0"
+          trailingSkip="0"
+          byteOrder="bigEndian"
+          bitOrder="mostSignificantBitFirst"
+      />
+    </xs:appinfo>
+  </xs:annotation>
+
+  <!--
+    Root element: a complete SimpleEDI message.
+    ibmDfdlExtn:docRoot marks this as the IBM DFDL document root.
+  -->
+  <xs:element name="SimpleMessage" ibmDfdlExtn:docRoot="true">
+    <xs:complexType>
+      <xs:sequence dfdl:separator="" dfdl:separatorPolicy="suppressed">
+        <xs:element name="HDR" type="edi:HDRType"
+            dfdl:initiator="HDR+"
+            dfdl:terminator="'%WSP*;"/>
+        <xs:element name="DTL" type="edi:DTLType" minOccurs="0" maxOccurs="99"
+            dfdl:initiator="DTL+"
+            dfdl:terminator="'%WSP*;"
+            dfdl:occursCountKind="parsed"/>
+        <xs:element name="TRL" type="edi:TRLType"
+            dfdl:initiator="TRL+"
+            dfdl:terminator="'%WSP*;"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- HDR segment: Sender, Receiver, Date (YYYYMMDD), MessageType -->
+  <xs:complexType name="HDRType">
+    <xs:sequence dfdl:separator="+" dfdl:separatorPosition="infix">
+      <xs:element name="Sender"      type="xs:string"/>
+      <xs:element name="Receiver"    type="xs:string"/>
+      <xs:element name="Date"        type="xs:string"/>
+      <xs:element name="MessageType" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- DTL segment: LineNum, ItemCode, Quantity, Unit -->
+  <xs:complexType name="DTLType">
+    <xs:sequence dfdl:separator="+" dfdl:separatorPosition="infix">
+      <xs:element name="LineNum"  type="xs:int"/>
+      <xs:element name="ItemCode" type="xs:string"/>
+      <xs:element name="Quantity" type="xs:int"/>
+      <xs:element name="Unit"     type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- TRL segment: ControlCount (number of DTL segments) -->
+  <xs:complexType name="TRLType">
+    <xs:sequence>
+      <xs:element name="ControlCount" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

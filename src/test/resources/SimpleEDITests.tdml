@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SimpleEDITests.tdml
+
+  TDML test suite for SimpleEDI.dfdl.xsd.
+  Tests run against both IBM DFDL (ACE) and Apache Daffodil.
+-->
+<tdml:testSuite
+    xmlns:tdml="http://www.ibm.com/xmlns/dfdl/testData"
+    xmlns:dfdl="http://www.ogf.org/dfdl/dfdl-1.0/"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:edi="http://example.com/simpleedi"
+    defaultImplementations="ibm daffodil"
+    defaultRoundTrip="onePass">
+
+  <!-- ============================================================
+       parseHappy: parse a valid two-line EDI message
+       ============================================================ -->
+  <tdml:parserTestCase name="parseHappy"
+      root="SimpleMessage"
+      model="SimpleEDI.dfdl.xsd"
+      roundTrip="none"
+      description="Parse a valid SimpleEDI message with HDR, two DTL records, and TRL">
+
+    <tdml:document>
+      <tdml:documentPart type="file">SimpleEDI-happy.txt</tdml:documentPart>
+    </tdml:document>
+
+    <tdml:infoset>
+      <tdml:dfdlInfoset>
+        <edi:SimpleMessage>
+          <HDR>
+            <Sender>SENDER01</Sender>
+            <Receiver>RECEIVER1</Receiver>
+            <Date>20250301</Date>
+            <MessageType>INVOIC</MessageType>
+          </HDR>
+          <DTL>
+            <LineNum>1</LineNum>
+            <ItemCode>WIDGET-A</ItemCode>
+            <Quantity>100</Quantity>
+            <Unit>EA</Unit>
+          </DTL>
+          <DTL>
+            <LineNum>2</LineNum>
+            <ItemCode>GADGET-B</ItemCode>
+            <Quantity>50</Quantity>
+            <Unit>BX</Unit>
+          </DTL>
+          <TRL>
+            <ControlCount>2</ControlCount>
+          </TRL>
+        </edi:SimpleMessage>
+      </tdml:dfdlInfoset>
+    </tdml:infoset>
+  </tdml:parserTestCase>
+
+  <!-- ============================================================
+       roundTrip: parse then unparse (two-pass round trip)
+       ============================================================ -->
+  <tdml:parserTestCase name="roundTrip"
+      root="SimpleMessage"
+      model="SimpleEDI.dfdl.xsd"
+      roundTrip="twoPass"
+      description="Round-trip: parse the happy-flow file and unparse back to the same data">
+
+    <tdml:document>
+      <tdml:documentPart type="file">SimpleEDI-happy.txt</tdml:documentPart>
+    </tdml:document>
+
+    <tdml:infoset>
+      <tdml:dfdlInfoset>
+        <edi:SimpleMessage>
+          <HDR>
+            <Sender>SENDER01</Sender>
+            <Receiver>RECEIVER1</Receiver>
+            <Date>20250301</Date>
+            <MessageType>INVOIC</MessageType>
+          </HDR>
+          <DTL>
+            <LineNum>1</LineNum>
+            <ItemCode>WIDGET-A</ItemCode>
+            <Quantity>100</Quantity>
+            <Unit>EA</Unit>
+          </DTL>
+          <DTL>
+            <LineNum>2</LineNum>
+            <ItemCode>GADGET-B</ItemCode>
+            <Quantity>50</Quantity>
+            <Unit>BX</Unit>
+          </DTL>
+          <TRL>
+            <ControlCount>2</ControlCount>
+          </TRL>
+        </edi:SimpleMessage>
+      </tdml:dfdlInfoset>
+    </tdml:infoset>
+  </tdml:parserTestCase>
+
+  <!-- ============================================================
+       parseError: TRL segment is missing its ControlCount field
+       ============================================================ -->
+  <tdml:parserTestCase name="parseError"
+      root="SimpleMessage"
+      model="SimpleEDI.dfdl.xsd"
+      description="Parse a malformed message where TRL has no fields — expect a parse error">
+
+    <tdml:document>
+      <tdml:documentPart type="file">SimpleEDI-error.txt</tdml:documentPart>
+    </tdml:document>
+
+    <tdml:errors>
+      <tdml:error>Parse Error</tdml:error>
+    </tdml:errors>
+  </tdml:parserTestCase>
+
+</tdml:testSuite>
