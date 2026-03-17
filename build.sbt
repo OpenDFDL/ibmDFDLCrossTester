@@ -31,14 +31,9 @@ lazy val processor = (project in file("processor"))
     // We really only want the bundled jars to be IBM jars and the IBM TDML processor.
     // The plugin will provide all other dependencies.
     libraryDependencies ++= Seq(
-      "javax.xml.bind" % "jaxb-api" % "2.3.1" % "provided"
-    ) ++ {
-      libraryDependencies.value
-        .filter { module =>
-          module.name == "daffodil-tdml-junit"
-        }
-        .map { _.withConfigurations(Some("provided,test")) }
-    },
+      "javax.xml.bind" % "jaxb-api" % "2.3.1" % "provided",
+      "org.apache.daffodil" %% "daffodil-tdml-processor" % daffodilVersion.value % "provided"
+    ),
     unmanagedBase := baseDirectory.value.getParentFile / "ibm-dfdl" / "lib",
     Test / unmanagedResourceDirectories += baseDirectory.value.getParentFile / "ibm-dfdl" / "src" / "test" / "resources",
     assembly / assemblyMergeStrategy := {
