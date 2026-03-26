@@ -32,7 +32,7 @@ lazy val processor = (project in file("processor"))
     // The plugin will provide all other dependencies.
     libraryDependencies ++= Seq(
       "javax.xml.bind" % "jaxb-api" % "2.3.1" % "provided",
-      "org.apache.daffodil" %% "daffodil-tdml-processor" % daffodilVersion.value % "provided"
+      "org.apache.daffodil" %% "daffodil-tdml-lib" % daffodilVersion.value % "provided"
     ),
     unmanagedBase := baseDirectory.value.getParentFile / "ibm-dfdl" / "lib",
     Test / unmanagedResourceDirectories += baseDirectory.value.getParentFile / "ibm-dfdl" / "src" / "test" / "resources",

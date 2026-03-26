@@ -26,14 +26,14 @@ object IBMDFDLPlugin extends AutoPlugin {
       Defaults.testSettings ++ Seq(
         sourceDirectory := (Test / sourceDirectory).value,
         sources := (Test / sources).value,
-        dependencyClasspath := (dependencyClasspath.value).filterNot { _.data.name.startsWith("icu4j")},
+        dependencyClasspath := (dependencyClasspath.value).filterNot { _.data.name.startsWith("daffodil-tdml-processor")},
+        dependencyClasspath := (dependencyClasspath.value).filterNot { _.data.name.startsWith("icu4j")}
       )
     ) ++
     Seq(
       libraryDependencies ++= Seq(
-        "junit" % "junit" % "4.13.2" % IbmConfig.name,
-        "com.github.sbt" % "junit-interface" % "0.13.3" % IbmConfig.name,
-        "io.github.openDFDL" % "ibm-tdml-processor" % sbtIbmDfdlPluginVersion % s"${IbmConfig.name}->compile"
+        "javax.xml.bind" % "jaxb-api" % "2.3.1" % IbmConfig.name,
+        "io.github.openDFDL" % "ibm-tdml-processor" % sbtIbmDfdlPluginVersion % IbmConfig.name
       ),
       ibmTest := (IbmConfig / test).value
     )

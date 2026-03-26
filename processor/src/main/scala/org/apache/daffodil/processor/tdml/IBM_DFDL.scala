@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.daffodil.tdml.processor
+package org.apache.daffodil.processor.tdml
 
 import com.ibm.dfdl.grammar.DFDLGrammarFactory
 import com.ibm.dfdl.grammar.IDFDLGrammar
@@ -43,7 +43,6 @@ import org.apache.daffodil.lib.iapi.URISchemaSource
 import org.apache.daffodil.lib.util.Maybe
 import org.apache.daffodil.lib.xml.DFDLCatalogResolver
 import org.apache.daffodil.lib.xml.XMLUtils
-import org.apache.daffodil.processor.tdml._
 import org.apache.daffodil.tdml.TDMLTestNotCompatibleException
 import org.apache.daffodil.tdml.processor.*
 import org.xml.sax.ErrorHandler
