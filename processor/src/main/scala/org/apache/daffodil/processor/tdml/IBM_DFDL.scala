@@ -212,8 +212,11 @@ final class TDMLDFDLProcessorFactory private (
         //
         // Turning on logging here may be helpful to debugging resolver issues
         // where files aren't being found.
-        //
-        // LoggingDefaults.setLoggingLevel(LogLevel.Resolver)
+        // import org.apache.daffodil.lib.util.Logger
+        // import org.apache.daffodil.slf4j.DaffodilLogger
+        // import org.slf4j.event.Level
+        //        lazy val daffodilLogger = Logger.log.underlying.asInstanceOf[DaffodilLogger]
+        //        daffodilLogger.setThreadLoggerConfig(Level.TRACE, System.err)
         //
         val er = DFDLCatalogResolver.get // Note: we're using Daffodil Resolver
         //
